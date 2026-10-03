@@ -14,4 +14,14 @@
 - Updated kernel configuration to disable trusted keyring and certificate requirements
 - Began full kernel build process; halted due to insufficient disk space on Acer device
 - Prepared migration plan to continue kernel build on secondary machine with adequate storage
+- Added /dev mount support via devtmpfs
+- Updated /init to mount /proc and /sys
+- Verified BusyBox shell boots cleanly
+- Confirmed QEMU boot sequence stable
+
+This will be all I shall do for tonight
+I shall resume this tomorrow.
+Hopefully you can grasp an understanding on what I'm doing and **HOPEFULLY** one day we could stand at the auditorium presenting Nimbus
+but that's for another day
+farewell, and good night comrade
 
