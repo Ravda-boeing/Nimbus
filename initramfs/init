@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Mount /dev
+mkdir -p /dev
+/bin/busybox mount -t devtmpfs devtmpfs /dev
+
+# Mount /proc and /sys
+/bin/busybox mount -t proc proc /proc
+/bin /busybox mount -t sysfs sys /sys
+
+# Drop to shell for the time being
+exec /bin/busybox sh
