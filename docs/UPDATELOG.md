@@ -5,3 +5,6 @@
 - Initial repo structure
 - Added base Makefile
 - stubbed init system entry point
+- Established dual-version architecture (Linux distro + custom kernel)
+- Prepared repo for Nimbus Linux distro development
+- Cleaned project structure for userland-only build path
