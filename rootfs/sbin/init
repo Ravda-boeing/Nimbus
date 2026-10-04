@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo
+echo "==========================================================="
+echo "                    Welcome to Nimbus"
+echo "==========================================================="
+echo
+echo "Nimbus userspace has started"
+echo
+
+exec /bin/sh

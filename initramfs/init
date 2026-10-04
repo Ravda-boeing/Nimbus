@@ -1,12 +1,54 @@
-#!/bin/sh
+#!/bin/busybox sh
 
-# Mount /dev
-mkdir -p /dev
-/bin/busybox mount -t devtmpfs devtmpfs /dev
+echo "Nimbus init: starting"
 
-# Mount /proc and /sys
-/bin/busybox mount -t proc proc /proc
-/bin /busybox mount -t sysfs sys /sys
+# Emergency shell
+rescue_shell() {
+    echo
+    echo "Nimbus init: Error"
+    echo "NImbus init: dropping to emergency shell"
+    exec /bin/sh
+}
 
-# Drop to shell for the time being
-exec /bin/busybox sh
+echo "Nimbus init: mounting virtual filesystems"
+
+mount -t devtmpfs devtmpfs /dev || rescue_shell
+mount -t proc proc /proc || rescue_shell
+mount -t sysfs sysfs /sys || rescue_shell
+
+echo "Nimbus init: virtual filesystems mounted"
+
+# Read root= from kernel command line
+ROOT_DEV="$(sed -n 's/.*root=\([^ ]*\).*/\1/p' /proc/cmdline)"
+
+if [ -z "$ROOT_DEV" ]; then
+    echo "Nimbus init: no root= specified"
+    echo "Nimbus init: defaulting to /dev/vda2"
+    ROOT_DEV="/dev/vda2"
+fi
+
+echo "Nimbus init: root device = $ROOT_DEV"
+
+mkdir -p /mnt/root
+
+echo "NImbus init: mounting real root filesystem"
+
+mount "$ROOT_DEV" /mnt/root || rescue_shell
+
+echo "Nimbus init: root filesystem mounted"
+
+# Verify required filex actually exist
+if [ ! -e /mnt/root/bin/busybox ]; then
+    echo "Nimbus init: ERROR: /mnt/root/bin/sh does not exist or is not executable"
+    rescue_shell
+fi
+
+if [ ! -e /mnt/root/sbin/init ]; then
+    echo "Nimbus init: ERROR: /mnt/root/sbin/init does not exist"
+    echo "Nimbus init: entering shell for debugging"
+    exec /bin/sh
+fi
+
+echo "NImbus init: switching to real root"
+
+exec switch_root /mnt/root /sbin/init

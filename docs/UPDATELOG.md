@@ -25,3 +25,16 @@ Hopefully you can grasp an understanding on what I'm doing and **HOPEFULLY** one
 but that's for another day
 farewell, and good night comrade
 
+### 2026-10-4 - Rav
+- Created a clean, minimal Nimbus root filesystem (rootfs/)
+- Added BusyBox-based /bin/sh for initial userspace shell
+- Implemented first Nimbus /sbin/init with boot banner and shell handoff
+- Updated initramfs /init to:
+  - mount /dev, /proc, /sys
+  - read root= from kernel cmdline
+  - mount real rootfs at /mnt/root
+  - verify /bin/sh and /sbin/init
+  - switch_root into Nimbus userspace
+- Completed full boot pipeline for Nimbus 0.1
+- Ready to boot Nimbus rootfs in QEMU
+
