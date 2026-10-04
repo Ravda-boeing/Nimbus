@@ -1,0 +1,14 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "Nimbus: starting login shell"
+        exec /bin/sh
+        ;;
+    stop)
+        echo "Nimbus: stopping login shell (not implemented)"
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        ;;
+esac

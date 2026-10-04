@@ -1,11 +1,60 @@
 #!/bin/sh
 
-echo
-echo "==========================================================="
-echo "                    Welcome to Nimbus"
-echo "==========================================================="
-echo
-echo "Nimbus userspace has started"
-echo
+# logging function
+log() {
+    echo "$(date) - $1" >> /var/log/nimbus.log
+}
 
+log "Nimbus init started"
+
+# Runlevel handling
+RUNLEVEL="${RUNLEVEL:-2}"
+
+case "$RUNLEVEL" in
+    1)
+        log "Runlevel 1: single-user rescue mode"
+        echo "Nimbus: entering single-user rescue mode"
+        exec /bin/sh
+        ;;
+    2)
+        log "Runlevel 2: normal boot"
+        echo "Nimbus: starting normal boot"
+        ;;
+    0)
+        log "Runlevel 0: shutdown"
+        echo "Nimbus: shutting down"
+        poweroff
+        ;;
+    *)
+        log "Unknown runlevel '$RUNLEVEL', defaulting to normal"
+        echo "Nimbus: unknown runlevel, defaulting to normal"
+        ;;
+esac
+
+# Emergency mode trigger
+if [ -f /etc/nimbus-emergency ]; then
+    log "Emergency mode file detected"
+    echo "Nimbus: emergency mode triggered"
+    exec /bin/sh
+fi
+
+# Show the majestic banner
+if [ -f /etc/nimbus-banner ]; then
+    cat /etc/nimbus-banner
+fi
+
+log "Running init.d services"
+
+# Run all init.d scripts
+for script in /etc/init.d/*; do
+    if [ -x "$script" ]; then
+        log "Starting service: $(basename "$script")"
+        "$script" start
+    fi
+done
+
+log "Init.d services completed"
+echo "Nimbus: init sequence complete"
+
+# Fallback shell 
 exec /bin/sh

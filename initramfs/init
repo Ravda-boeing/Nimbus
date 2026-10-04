@@ -6,7 +6,7 @@ echo "Nimbus init: starting"
 rescue_shell() {
     echo
     echo "Nimbus init: Error"
-    echo "NImbus init: dropping to emergency shell"
+    echo "Nimbus init: dropping to emergency shell"
     exec /bin/sh
 }
 
@@ -31,24 +31,24 @@ echo "Nimbus init: root device = $ROOT_DEV"
 
 mkdir -p /mnt/root
 
-echo "NImbus init: mounting real root filesystem"
+echo "Nimbus init: mounting real root filesystem"
 
 mount "$ROOT_DEV" /mnt/root || rescue_shell
 
 echo "Nimbus init: root filesystem mounted"
 
-# Verify required filex actually exist
-if [ ! -e /mnt/root/bin/busybox ]; then
+# Verify required files actually exist and are executable
+if [ ! -x /mnt/root/bin/sh ]; then
     echo "Nimbus init: ERROR: /mnt/root/bin/sh does not exist or is not executable"
     rescue_shell
 fi
 
-if [ ! -e /mnt/root/sbin/init ]; then
-    echo "Nimbus init: ERROR: /mnt/root/sbin/init does not exist"
+if [ ! -x /mnt/root/sbin/init ]; then
+    echo "Nimbus init: ERROR: /mnt/root/sbin/init does not exist or is not executable"
     echo "Nimbus init: entering shell for debugging"
     exec /bin/sh
 fi
 
-echo "NImbus init: switching to real root"
+echo "Nimbus init: switching to real root"
 
 exec switch_root /mnt/root /sbin/init

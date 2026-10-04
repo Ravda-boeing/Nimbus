@@ -37,4 +37,10 @@ farewell, and good night comrade
   - switch_root into Nimbus userspace
 - Completed full boot pipeline for Nimbus 0.1
 - Ready to boot Nimbus rootfs in QEMU
+- Added init.d scripts: mountfs, banner, network, login
+- Implemented Nimbus logging system (var/log/nimbus.log)
+- Created Nimbus branding foundation and visual logo concept
+- Updated boot sequence messages for consistent Nimbus identity
+- Prepared repository for commit and push
+
 

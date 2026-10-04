@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "Nimbus: mounting filesystems"
+        mount -a
+        ;;
+    stop)
+        echo "Nimbus: unmounting filesystems"
+        umount -a
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        ;;
+esac
