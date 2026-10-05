@@ -1,0 +1,19 @@
+Name: nimbus-tools
+Version: 0.3.1
+Architecture: x86_64
+Summary: Core Nimbus userland tools
+Description: Provides basic informational and logging utilities for Nimbus OS.
+Maintainer: Rav <dev@nimbus.os>
+License: MIT
+Section: system
+Priority: optional
+
+Depends: nimbus-core (>= 0.2), busybox
+Conflicts: nimbus-tools-legacy
+Provides: nimbus-tools
+Replaces: nimbus-tools-legacy
+
+Files:
+  /usr/bin/nimbus-version
+  /usr/bin/nimbus-info
+  /usr/bin/nimbus-log

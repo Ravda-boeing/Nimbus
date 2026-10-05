@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Nimbus OS Commands:"
+echo "  nimbus-version   - Show Nimbus OS version"
+echo "  nimbus-info      - Show system information"
+echo "  nimbus-log       - View Nimbus system log"
+echo "  nimbus-help      - Show this help menu"
+echo "  power shutdown   - Shut down Nimbus"
+echo "  power reboot     - Reboot Nimbus"

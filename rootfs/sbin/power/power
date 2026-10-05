@@ -1,0 +1,49 @@
+#!/bin/sh
+
+log() {
+    echo "$(date) - $1" >> /var/log/nimbus.log
+}
+
+stop_services() {
+    for script in /etc/init.d/*; do
+        if [ -x "$script" ]; then
+            log "Stopping service: $(basename "$script")"
+            "$script" stop
+        fi
+    done
+}
+
+case "$1" in
+    shutdown)
+        log "Nimbus: shutdown requested"
+        stop_services
+        log "Unmounting filesystems"
+        umount /proc
+        umount /sys
+        umount /dev
+        log "System halted"
+        exec /sbin/halt -f
+        ;;
+
+    reboot)
+        log "Nimbus: reboot requested"
+        stop_services
+        log "Unmounting filesystems"
+        umount /proc
+        umount /sys
+        umount /dev
+        log "Rebooting system"
+        exec /sbin/reboot -f
+        ;;
+
+    halt)
+        log "Nimbus: halt requested"
+        stop_services
+        log "System halted"
+        exec /sbin/halt -f
+        ;;
+
+    *)
+        echo "Usage: power {shutdown|reboot|halt}"
+        ;;
+esac

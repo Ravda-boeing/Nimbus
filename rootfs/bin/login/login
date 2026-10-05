@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo -n "Nimbus login: "
+read USER
+
+echo -n "Password: "
+# disable echo for password input
+stty -echo
+read PASS
+stty echo
+echo
+
+# simple hardcoded credentials (upgrade later)
+if [ "$USER" = "nimbus" ] && [ "$PASS" = "os" ]; then
+    echo "Welcome to Nimbus, $USER!"
+
+    # optional MOTD
+    [ -f /etc/nimbus-motd ] && cat /etc/nimbus-motd
+
+    exec /bin/sh
+else
+    echo "Login incorrect"
+    exec /bin/login
+fi

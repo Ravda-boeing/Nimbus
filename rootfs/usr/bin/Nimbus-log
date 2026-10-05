@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ -f /var/log/nimbus.log ]; then
+    cat /var/log/nimbus.log
+else
+    echo "No Nimbus logs found."
+fi

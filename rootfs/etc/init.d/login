@@ -2,13 +2,11 @@
 
 case "$1" in
     start)
-        echo "Nimbus: starting login shell"
-        exec /bin/sh
+        echo "Nimbus: starting login service"
+        exec /bin/login
         ;;
     stop)
-        echo "Nimbus: stopping login shell (not implemented)"
-        ;;
-    *)
-        echo "Usage: $0 {start|stop}"
+        echo "Nimbus: stopping login service"
+        killall login 2>/dev/null
         ;;
 esac

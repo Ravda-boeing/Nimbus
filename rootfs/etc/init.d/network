@@ -2,6 +2,18 @@
 
 case "$1" in
     start)
+        echo "Starting mountfs..."
+        mount -t proc proc /proc
+        mount -t sysfs sys /sys
+        ;;
+    stop)
+        echo "Stopping mountfs..."
+        umount /proc
+        umount /sys
+        ;;
+esac
+case "$1" in
+    start)
         echo "Nimbus: network service not implemented yet"
         ;;
     stop)

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Nimbus reboot handoff
+
+echo "Nimbus: handing reboot to kernel"
+exec busybox reboot

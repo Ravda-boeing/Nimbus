@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "Nimbus System Information"
+echo "--------------------------"
+echo "Hostname: $(cat /etc/hostname 2>/dev/null)"
+echo "Kernel: $(uname -r)"
+echo "Shell: $SHELL"
+echo "User: $USER"
