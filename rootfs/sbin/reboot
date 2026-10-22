@@ -1,0 +1,9 @@
+#!/bin/sh
+# Nimbus reboot. "reboot -f" goes straight to the kernel (used by power);
+# plain "reboot" goes through power so services are stopped first.
+
+if [ "$1" = "-f" ]; then
+    echo "Nimbus: handing reboot to kernel"
+    exec /bin/busybox reboot -f
+fi
+exec /sbin/power reboot

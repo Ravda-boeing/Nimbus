@@ -1,0 +1,5 @@
+# kernel source is not tracked; only kernel-config/nimbus_defconfig is
+kernel/
+# build outputs
+build/
+*.img

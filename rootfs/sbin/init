@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# kernel gives PID 1 no PATH
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
 stop_services() {
     echo "Nimbus: stopping all services..."
     for script in /etc/init.d/*; do
