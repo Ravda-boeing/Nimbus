@@ -17,6 +17,7 @@ if [ "$USER" = "nimbus" ] && [ "$PASS" = "os" ]; then
     export USER
     export SHELL=/bin/sh
     export HOME=/root
+    export ENV=/etc/nimbus-shrc
     cd "$HOME" 2>/dev/null
 
     # optional MOTD

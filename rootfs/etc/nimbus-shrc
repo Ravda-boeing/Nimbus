@@ -1,0 +1,6 @@
+# Read by interactive shells (via $ENV, set in /bin/login).
+# BusyBox's shell runs its built-in applets before looking at PATH, so make
+# the power commands use the Nimbus wrappers in /sbin instead.
+alias poweroff='/sbin/poweroff'
+alias halt='/sbin/halt'
+alias reboot='/sbin/reboot'

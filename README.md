@@ -45,6 +45,5 @@ To boot a different kernel (for testing): `NIMBUS_KERNEL=/path/to/kernel make ru
 
 ## Known gaps
 
-- Plain `poweroff`/`halt` don't work yet; use `power shutdown`, `power reboot`.
 - Login is hardcoded (`nimbus`/`os`). No real users yet.
 - No networking.

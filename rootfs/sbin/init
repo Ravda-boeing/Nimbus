@@ -69,5 +69,9 @@ done
 log "Init.d services completed"
 echo "Nimbus: init sequence complete"
 
-# Fallback shell 
-exec /bin/login
+# Keep PID 1 alive. Run login in its own session (setsid -c gives it a
+# controlling terminal, so job control and Ctrl+C work) and start it again
+# whenever it exits, instead of letting init die.
+while true; do
+    setsid -c /bin/login || sleep 1
+done

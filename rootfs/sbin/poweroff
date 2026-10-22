@@ -1,0 +1,8 @@
+#!/bin/sh
+# Nimbus poweroff. "poweroff -f" goes straight to the kernel (used by power);
+# plain "poweroff" goes through power so services are stopped first.
+
+if [ "$1" = "-f" ]; then
+    exec /bin/busybox poweroff -f
+fi
+exec /sbin/power shutdown

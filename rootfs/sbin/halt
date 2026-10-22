@@ -1,0 +1,8 @@
+#!/bin/sh
+# Nimbus halt. "halt -f" goes straight to the kernel (used by power);
+# plain "halt" goes through power so services are stopped first.
+
+if [ "$1" = "-f" ]; then
+    exec /bin/busybox halt -f
+fi
+exec /sbin/power halt
