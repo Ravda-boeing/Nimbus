@@ -88,3 +88,9 @@ Follow-ups from the first boot test
 - `/sbin/init` now stays running as PID 1 and starts `/bin/login` in a loop through `setsid -c` (its own session with a controlling terminal), instead of `exec`ing login: fixes "can't access tty; job control turned off" (job control and Ctrl+C work) and typing `exit` no longer kills init; login restarts after logout
 - Added `/sbin/poweroff` and `/sbin/halt` wrappers: plain `poweroff`/`halt`/`reboot` go through `power` (services stop first); the `-f` form goes straight to the kernel, which is what `power` uses
 - Added `/etc/nimbus-shrc` (loaded via `ENV` from `/bin/login`): aliases `poweroff`, `halt`, `reboot` to the `/sbin` wrappers, because BusyBox's shell runs its built-in applets before searching PATH
+
+### 2026-10-22 - Rav
+Phase 1 prep (LFS-style base system)
+- Added `tools/phase1/check-host.sh`: checks the host has what an LFS build needs (tool versions, bash as /bin/sh, gawk, bison as yacc, working compilers, cores/RAM/disk)
+- Added `tools/phase1/lfs-disk.sh`: creates, mounts and unmounts a sparse ext4 build disk image at /mnt/lfs (keeps the build off the real partitions)
+- Added `tools/phase1/setup-build-env.sh`: LFS chapter 4 (directory layout in /mnt/lfs, `lfs` build user with a clean environment, `sources` directory)
