@@ -105,3 +105,4 @@ Phase 1: Binutils pass 1 built, GCC pass 1 recipe
 - Built Binutils pass 1 with `tools/phase1/build-pkg.sh` on the Veriton: 81 s, so 1 SBU = 81 s on this machine
 - Added `tools/phase1/recipes/ch5/gcc-pass1.sh`: LFS chapter 5.3, GCC pass 1 (unpacks MPFR/GMP/MPC into the GCC tree, sets the 64-bit lib dir to `lib`, builds the cross compiler, writes the full internal `limits.h`); the Glibc version for `--with-glibc-version` is read from the glibc tarball
 - `build-pkg.sh`: added a `tarball_path` helper that recipes can use to locate other source tarballs
+- GCC pass 1 built and verified on the Veriton: 1013 s (~12.5 SBU); cross-compiler reports the correct target and successfully compiles a test C file into an x86-64 relocatable object
