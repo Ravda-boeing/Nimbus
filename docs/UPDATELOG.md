@@ -112,3 +112,5 @@ Phase 1: Linux API Headers and Glibc recipes
 - Added `tools/phase1/recipes/ch5/linux-headers.sh`: LFS chapter 5.4 (`make mrproper`, `make headers`, strip non-.h files, copy into $LFS/usr)
 - Added `tools/phase1/recipes/ch5/glibc.sh`: LFS chapter 5.5, cross-compiled Glibc installed into $LFS (loader symlinks, FHS patch, upstream-fixes patch found by name pattern, `--enable-kernel=5.10`, `ldd` fix, and the book's sanity checks automated: wrong program interpreter or missing new loader fails the build)
 - `build-pkg.sh`: refuses to run with LFS set to `/` (the Glibc install would otherwise go onto the host)
+- Built Linux API Headers (7 s) and Glibc (365 s) on the Veriton; both passed their checks
+- Added `tools/phase1/recipes/ch5/libstdcpp.sh`: LFS chapter 5.6, Libstdc++ from the GCC source tree (GCC version for the include dir is read from the gcc tarball name)
