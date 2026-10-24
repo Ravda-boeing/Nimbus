@@ -114,3 +114,13 @@ Phase 1: Linux API Headers and Glibc recipes
 - `build-pkg.sh`: refuses to run with LFS set to `/` (the Glibc install would otherwise go onto the host)
 - Built Linux API Headers (7 s) and Glibc (365 s) on the Veriton; both passed their checks
 - Added `tools/phase1/recipes/ch5/libstdcpp.sh`: LFS chapter 5.6, Libstdc++ from the GCC source tree (GCC version for the include dir is read from the gcc tarball name)
+
+### 2026-10-25 - Rav
+Phase 1: Libstdc++ built and verified
+- Built and installed Libstdc++ from GCC 16.2.0 using the Phase 1 recipe
+- Verified target compiler identity: x86_64-lfs-linux-gnu
+- Confirmed target C++ headers and shared/static libraries are installed
+- Confirmed libtool archives were removed
+- Compiled and linked a C++ test executable against the target sysroot; verified its ELF interpreter and shared-library dependencies
+- Ran the test executable on the host successfully; target-root runtime execution remains a separate verification step
+- Recorded Libstdc++ build time: 79 seconds
