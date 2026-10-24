@@ -28,6 +28,7 @@ if [ "$(id -un)" != lfs ] && [ -z "${NIMBUS_ALLOW_ANYUSER:-}" ]; then
 fi
 : "${LFS:?LFS is not set (is this a login shell of the lfs user?)}"
 : "${LFS_TGT:?LFS_TGT is not set (is this a login shell of the lfs user?)}"
+[ "$LFS" != "/" ] || die "LFS must not be / (packages would install onto the host)"
 [ -d "$LFS/sources" ] || die "$LFS/sources not found (is the build disk mounted?)"
 
 logs="$LFS/sources/.logs"

@@ -106,3 +106,9 @@ Phase 1: Binutils pass 1 built, GCC pass 1 recipe
 - Added `tools/phase1/recipes/ch5/gcc-pass1.sh`: LFS chapter 5.3, GCC pass 1 (unpacks MPFR/GMP/MPC into the GCC tree, sets the 64-bit lib dir to `lib`, builds the cross compiler, writes the full internal `limits.h`); the Glibc version for `--with-glibc-version` is read from the glibc tarball
 - `build-pkg.sh`: added a `tarball_path` helper that recipes can use to locate other source tarballs
 - GCC pass 1 built and verified on the Veriton: 1013 s (~12.5 SBU); cross-compiler reports the correct target and successfully compiles a test C file into an x86-64 relocatable object
+
+### 2026-10-25 - Rav
+Phase 1: Linux API Headers and Glibc recipes
+- Added `tools/phase1/recipes/ch5/linux-headers.sh`: LFS chapter 5.4 (`make mrproper`, `make headers`, strip non-.h files, copy into $LFS/usr)
+- Added `tools/phase1/recipes/ch5/glibc.sh`: LFS chapter 5.5, cross-compiled Glibc installed into $LFS (loader symlinks, FHS patch, upstream-fixes patch found by name pattern, `--enable-kernel=5.10`, `ldd` fix, and the book's sanity checks automated: wrong program interpreter or missing new loader fails the build)
+- `build-pkg.sh`: refuses to run with LFS set to `/` (the Glibc install would otherwise go onto the host)
