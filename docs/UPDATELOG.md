@@ -99,3 +99,9 @@ Phase 1 prep (LFS-style base system)
 Phase 1: first package build tooling
 - Added `tools/phase1/build-pkg.sh`: builds one package from a recipe as the `lfs` user (unpacks the tarball from $LFS/sources, runs the recipe's `build()`, logs to $LFS/sources/.logs, records build time in `times.txt`, cleans up on success, keeps the work dir on failure)
 - Added `tools/phase1/recipes/ch5/binutils-pass1.sh`: LFS chapter 5.2, Binutils pass 1 (its build time is 1 SBU)
+
+### 2026-10-24 - Rav
+Phase 1: Binutils pass 1 built, GCC pass 1 recipe
+- Built Binutils pass 1 with `tools/phase1/build-pkg.sh` on the Veriton: 81 s, so 1 SBU = 81 s on this machine
+- Added `tools/phase1/recipes/ch5/gcc-pass1.sh`: LFS chapter 5.3, GCC pass 1 (unpacks MPFR/GMP/MPC into the GCC tree, sets the 64-bit lib dir to `lib`, builds the cross compiler, writes the full internal `limits.h`); the Glibc version for `--with-glibc-version` is read from the glibc tarball
+- `build-pkg.sh`: added a `tarball_path` helper that recipes can use to locate other source tarballs

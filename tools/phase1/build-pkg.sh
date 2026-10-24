@@ -8,6 +8,8 @@
 # and defines
 #   build()                        commands, run inside the unpacked source dir
 #
+# Recipes may call  tarball_path '<glob>'  to find another file in $LFS/sources.
+#
 # For each package this script: checks the environment, unpacks the tarball
 # into $LFS/sources/.work/<name>, runs build(), logs everything to
 # $LFS/sources/.logs/<name>.log, records the time in $LFS/sources/.logs/times.txt,
@@ -32,23 +34,32 @@ logs="$LFS/sources/.logs"
 work="$LFS/sources/.work/$name"
 mkdir -p "$logs" "$LFS/sources/.work"
 
+shopt -s nullglob
+
+# helper for recipes: print the one file in $LFS/sources matching a glob
+tarball_path() {
+    local m=( "$LFS"/sources/$1 )
+    if [ "${#m[@]}" -ne 1 ]; then
+        echo "build-pkg: expected exactly one file matching $1 in $LFS/sources, found ${#m[@]}" >&2
+        return 1
+    fi
+    printf '%s\n' "${m[0]}"
+}
+
 unset TARBALL
 # shellcheck disable=SC1090
 source "$recipe"
 [ -n "${TARBALL:-}" ] || die "$recipe does not set TARBALL"
 declare -F build >/dev/null || die "$recipe does not define build()"
 
-shopt -s nullglob
-# shellcheck disable=SC2206
-files=( "$LFS"/sources/$TARBALL )
-[ "${#files[@]}" -eq 1 ] || die "expected exactly one file matching $TARBALL in $LFS/sources, found ${#files[@]}"
+tarball=$(tarball_path "$TARBALL") || exit 1
 
 rm -rf "$work"
 mkdir -p "$work"
-tar -xf "${files[0]}" -C "$work" --strip-components=1
+tar -xf "$tarball" -C "$work" --strip-components=1
 cd "$work"
 
-echo "== $name: building from $(basename "${files[0]}") ==" | tee "$logs/$name.log"
+echo "== $name: building from $(basename "$tarball") ==" | tee "$logs/$name.log"
 start=$SECONDS
 set +e
 ( set -e; build ) 2>&1 | tee -a "$logs/$name.log"
