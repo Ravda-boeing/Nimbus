@@ -94,3 +94,8 @@ Phase 1 prep (LFS-style base system)
 - Added `tools/phase1/check-host.sh`: checks the host has what an LFS build needs (tool versions, bash as /bin/sh, gawk, bison as yacc, working compilers, cores/RAM/disk)
 - Added `tools/phase1/lfs-disk.sh`: creates, mounts and unmounts a sparse ext4 build disk image at /mnt/lfs (keeps the build off the real partitions)
 - Added `tools/phase1/setup-build-env.sh`: LFS chapter 4 (directory layout in /mnt/lfs, `lfs` build user with a clean environment, `sources` directory)
+
+### 2026-10-24 - Rav
+Phase 1: first package build tooling
+- Added `tools/phase1/build-pkg.sh`: builds one package from a recipe as the `lfs` user (unpacks the tarball from $LFS/sources, runs the recipe's `build()`, logs to $LFS/sources/.logs, records build time in `times.txt`, cleans up on success, keeps the work dir on failure)
+- Added `tools/phase1/recipes/ch5/binutils-pass1.sh`: LFS chapter 5.2, Binutils pass 1 (its build time is 1 SBU)
