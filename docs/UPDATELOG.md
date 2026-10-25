@@ -149,3 +149,16 @@ Phase 1: Chapter 6.4 to 6.7
 - Added `tools/phase1/recipes/ch6/{bash,coreutils,diffutils,file}.sh`
 - Coreutils includes the glibc-2.43 memchr/bsearch sed fix; Diffutils sets gl_cv_func_strcasecmp_works=yes
 - Built on the Veriton: bash NNs, coreutils NNs, diffutils NNs, file NNs
+
+## Phase 1 — Chapter 6 package builds (2026-10-25)
+
+Added recipes for the following LFS 13.1 systemd Chapter 6 packages:
+
+- Findutils 4.11.0 — build succeeded (46s).
+- Gawk 5.4.1 — build succeeded (30s).
+- Grep 3.12 — build succeeded (33s).
+- Gzip 1.14 — build succeeded (25s).
+- Make 4.4.1 — build succeeded (12s).
+
+Builds were run with the Nimbus Phase 1 package runner as the `lfs` user.
+Successful build times and logs are recorded under `$LFS/sources/.logs/`.
