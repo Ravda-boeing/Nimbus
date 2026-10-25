@@ -162,3 +162,34 @@ Added recipes for the following LFS 13.1 systemd Chapter 6 packages:
 
 Builds were run with the Nimbus Phase 1 package runner as the `lfs` user.
 Successful build times and logs are recorded under `$LFS/sources/.logs/`.
+
+### 2026-10-25 — Phase 1 recovery and toolchain progress
+- Recovered the existing LFS build image after a host crash; filesystem check completed cleanly.
+- Confirmed successful Chapter 6 builds: Patch (21s), Sed (31s), Tar (40s), and XZ (23s).
+- Added the Binutils Pass 2 recipe and confirmed its build succeeded.
+- Added the GCC Pass 2 recipe; corrected MPFR, GMP, and MPC archive lookup to use the Nimbus package runner.
+- GCC Pass 2 build remains pending.
+
+### 2026-10-25 — GCC Pass 2 completed
+- Completed the GCC Pass 2 recipe; build runner recorded 1577 seconds.
+- Verified /mnt/lfs/usr/bin/gcc and g++ exist, and cc links to gcc.
+- Recovered the existing LFS build image after a host reboot and remounted it.
+
+### 2026-10-25 — Recovery and Chapter 7 Gettext preparation
+- Recovered the LFS build image after a host crash and remounted it at /mnt/lfs.
+- Restored the chroot support mounts: /dev, /dev/pts, /dev/shm, /proc, /sys, and /run.
+- Added an initial Chapter 7 Gettext script at tools/phase1/recipes/ch7/gettext.sh; build not yet run.
+
+### 2026-10-25 — Gettext Chapter 7 build completed
+- Created and syntax-checked the Chapter 7 Gettext build script.
+- Restored the LFS image and chroot support mounts after a host crash.
+- Created /tmp inside chroot with mode 1777 after configure could not create a temporary directory.
+- Built Gettext-1.0 inside chroot and copied msgfmt, msgmerge, and xgettext into /usr/bin.
+- Verified all three tools exist; build completed successfully.
+
+### 2026-10-25 — Gettext Chapter 7 build completed
+- Created and syntax-checked the Chapter 7 Gettext build script.
+- Restored the LFS image and chroot support mounts after a host crash.
+- Created /tmp inside chroot with mode 1777 after configure could not create a temporary directory.
+- Built Gettext-1.0 inside chroot and copied msgfmt, msgmerge, and xgettext into /usr/bin.
+- Verified all three tools exist; build completed successfully.
