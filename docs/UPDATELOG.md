@@ -143,3 +143,9 @@ Phase 1: Chapter 6.3, Ncurses 6.6 built and verified
 - Build log confirms the terminfo database was installed with 1,861 entries
 - Recorded build time: 100 seconds
 - Fake-tarball testing remains outstanding
+
+### 2026-10-25 - Rav
+Phase 1: Chapter 6.4 to 6.7
+- Added `tools/phase1/recipes/ch6/{bash,coreutils,diffutils,file}.sh`
+- Coreutils includes the glibc-2.43 memchr/bsearch sed fix; Diffutils sets gl_cv_func_strcasecmp_works=yes
+- Built on the Veriton: bash NNs, coreutils NNs, diffutils NNs, file NNs
