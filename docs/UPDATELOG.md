@@ -133,3 +133,13 @@ Phase 1: Chapter 6.2, M4 built and verified
 - Build log ends with successful installation steps
 - Recorded M4 build time: 34 seconds
 - Chapter 6 `config.site` setup still needs separate verification
+
+### 2026-10-25 - Rav
+Phase 1: Chapter 6.3, Ncurses 6.6 built and verified
+- Added `tools/phase1/recipes/ch6/ncurses.sh` following LFS 13.1-systemd Chapter 6.3
+- Built and installed Ncurses 6.6 using the Phase 1 build runner as the `lfs` user
+- Verified the host-side `tic` utility was installed at `/tools/bin/tic`
+- Verified target `curses.h` and the `libncurses.so` compatibility symlink
+- Build log confirms the terminfo database was installed with 1,861 entries
+- Recorded build time: 100 seconds
+- Fake-tarball testing remains outstanding
