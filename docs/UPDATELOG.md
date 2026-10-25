@@ -124,3 +124,12 @@ Phase 1: Libstdc++ built and verified
 - Compiled and linked a C++ test executable against the target sysroot; verified its ELF interpreter and shared-library dependencies
 - Ran the test executable on the host successfully; target-root runtime execution remains a separate verification step
 - Recorded Libstdc++ build time: 79 seconds
+
+### 2026-10-25 - Rav
+Phase 1: Chapter 6.2, M4 built and verified
+- Added `tools/phase1/recipes/ch6/m4.sh` for LFS 13.1-systemd Chapter 6.2, M4 1.4.21
+- Built and installed M4 using the Phase 1 build runner
+- Verified `/mnt/lfs/usr/bin/m4` exists and is executable
+- Build log ends with successful installation steps
+- Recorded M4 build time: 34 seconds
+- Chapter 6 `config.site` setup still needs separate verification
