@@ -74,22 +74,26 @@ can touch the real Mint system.
 - Every chapter 7 script must refuse to run unless it is root inside the
   chroot (the existing ones check for `/sources/<tarball>` and `/usr/bin/gcc`,
   which do not exist on the host). Keep that check in new ones.
-- The exact mount and enter commands are in the book (sections 7.3 and 7.4).
-  A helper script for them is planned and is **not written yet**. Copy from the
-  book, not from memory.
+- Use `tools/phase1/chroot.sh` (subcommands `status`, `check`, `mount`,
+  `enter`, `umount`). It reproduces the book's commands from sections 7.3 and
+  7.4, and `DRY_RUN=1` prints them without running anything. One addition to the
+  book: `mount --make-rslave` on `$LFS/dev`, so mounts made inside the chroot
+  cannot propagate back to the host's `/dev` on a systemd host.
+  `chroot.sh check` compares the tree with sections 7.5 and 7.6 (read-only) and
+  flags a stray `/usr/lib64`, which the book says must not exist.
 
-### Chapter 7 status (as of 2026-10-25, partly unverified)
+### Chapter 7 status (as of 2026-10-26, from a read-only look at the tree)
 
-- 7.2 ownership: the tree was root-owned when last checked, so this appears done.
-- 7.3 / 7.4 mounts and chroot: were set up by hand after crashes, and are gone
-  after every reboot.
-- 7.5 directories and 7.6 essential files (`/etc/passwd`, `/etc/group`,
-  `/etc/hosts`, log files, symlinks): **not confirmed.** `/tmp` had to be
-  created by hand, which suggests 7.5 was not run in order. Check the book's
-  list against the tree before building more.
-- 7.7 Gettext: built (the three tools are in `/usr/bin`).
-- 7.8 Bison: recipe exists, build not confirmed.
-- 7.9 Perl, 7.10 Python, 7.11 Texinfo, 7.12 Util-linux, 7.13 cleanup: not started.
+- 7.2 ownership: done (the tree is root-owned).
+- 7.3 / 7.4 mounts and chroot: gone after every reboot; use `chroot.sh`.
+- 7.5 directories: done except `/root` (mode 0750), which is missing.
+  `/tmp` was created by hand (mode 1777, correct). `/var/tmp` was not checked.
+  Run `chroot.sh check` for the full list.
+- 7.6 essential files: present (`passwd`, `group`, `hosts`, the `mtab` link and the
+  four log files with the right modes).
+- 7.7 Gettext: installed. 7.8 Bison: installed (not yet in the log).
+  7.9 Perl: installed (not yet in the log; verify).
+- 7.10 Python, 7.11 Texinfo, 7.12 Util-linux, 7.13 cleanup: not started.
 
 ## Build status
 
