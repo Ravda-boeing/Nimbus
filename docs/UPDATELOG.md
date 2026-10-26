@@ -25,7 +25,7 @@ Hopefully you can grasp an understanding on what I'm doing and **HOPEFULLY** one
 but that's for another day
 farewell, and good night comrade
 
-### 2026-10-4 - Rav
+### 2026-10-04 - Rav
 - Created a clean, minimal Nimbus root filesystem (rootfs/)
 - Added BusyBox-based /bin/sh for initial userspace shell
 - Implemented first Nimbus /sbin/init with boot banner and shell handoff
@@ -76,12 +76,12 @@ Previously unlogged work (done before today, recorded here)
 - `/sbin/power`, `/sbin/reboot`, and the `nimbus-help/info/log/version` tools
 - The `nimbus-tools` package skeleton (`.npskg`)
 
-Known gaps: plain `poweroff`/`halt` don't work yet (use `power`); login is hardcoded; no networking.
+Known gaps: plain `poweroff`/`halt` don't work yet (use `power`); login is hardcoded; no networking. (`poweroff`/`halt` fixed in the 2026-10-22 follow-ups entry below.)
 
 Verification and kernel config
 - Added `kernel-config/nimbus_defconfig` (x86_64_defconfig + kvm_guest.config, saved with `make savedefconfig`); kernel 7.2.8 builds to `build/bzImage`
 - Booted in QEMU on the Nimbus kernel: initramfs -> switch_root -> init.d services -> login (`nimbus`/`os`) -> `nimbus-version`, `nimbus-info`, `nimbus-log` -> `power shutdown` (clean ACPI power-off)
-- Known: "can't access tty; job control turned off" appears after login (planned fix: start the shell with `cttyhack`)
+- Known: "can't access tty; job control turned off" appears after login (the `cttyhack` plan did not work; fixed differently in the 2026-10-22 follow-ups entry below)
 
 ### 2026-10-22 - Rav
 Follow-ups from the first boot test
@@ -132,7 +132,7 @@ Phase 1: Chapter 6.2, M4 built and verified
 - Verified `/mnt/lfs/usr/bin/m4` exists and is executable
 - Build log ends with successful installation steps
 - Recorded M4 build time: 34 seconds
-- Chapter 6 `config.site` setup still needs separate verification
+- Chapter 6 `config.site` setup still needs separate verification (resolved 2026-10-26: nothing to do. The book sets CONFIG_SITE to a path under $LFS on purpose, so the host's /usr/share/config.site is never read; no file has to be created)
 
 ### 2026-10-25 - Rav
 Phase 1: Chapter 6.3, Ncurses 6.6 built and verified
@@ -142,54 +142,44 @@ Phase 1: Chapter 6.3, Ncurses 6.6 built and verified
 - Verified target `curses.h` and the `libncurses.so` compatibility symlink
 - Build log confirms the terminfo database was installed with 1,861 entries
 - Recorded build time: 100 seconds
-- Fake-tarball testing remains outstanding
+- Fake-tarball testing was skipped for this recipe; the real build succeeded
 
 ### 2026-10-25 - Rav
 Phase 1: Chapter 6.4 to 6.7
 - Added `tools/phase1/recipes/ch6/{bash,coreutils,diffutils,file}.sh`
 - Coreutils includes the glibc-2.43 memchr/bsearch sed fix; Diffutils sets gl_cv_func_strcasecmp_works=yes
-- Built on the Veriton: bash NNs, coreutils NNs, diffutils NNs, file NNs
+- Built on the Veriton: bash 47 s, coreutils 92 s, diffutils 35 s, file 24 s
 
-## Phase 1 — Chapter 6 package builds (2026-10-25)
+### 2026-10-25 - Rav
+Phase 1: Chapter 6.8 to 6.12
+- Added recipes for Findutils 4.11.0, Gawk 5.4.1, Grep 3.12, Gzip 1.14 and Make 4.4.1 (LFS 13.1 systemd)
+- Built with the Phase 1 package runner as the `lfs` user: findutils 46 s, gawk 30 s, grep 33 s, gzip 25 s, make 12 s
+- Build times and logs are recorded under `$LFS/sources/.logs/`
 
-Added recipes for the following LFS 13.1 systemd Chapter 6 packages:
+### 2026-10-25 - Rav
+Phase 1: recovery, Chapter 6.13 to 6.16, Binutils pass 2
+- Recovered the existing LFS build image after a host crash; the filesystem check completed cleanly
+- Built Patch (21 s), Sed (31 s), Tar (40 s) and Xz (23 s)
+- Added the Binutils pass 2 recipe and built it (114 s)
+- Added the GCC pass 2 recipe; fixed the MPFR, GMP and MPC lookup to use the runner's `tarball_path`
 
-- Findutils 4.11.0 — build succeeded (46s).
-- Gawk 5.4.1 — build succeeded (30s).
-- Grep 3.12 — build succeeded (33s).
-- Gzip 1.14 — build succeeded (25s).
-- Make 4.4.1 — build succeeded (12s).
+### 2026-10-25 - Rav
+Phase 1: GCC pass 2 completed
+- GCC pass 2 built in 1577 s (the runner's recorded time)
+- Verified /mnt/lfs/usr/bin/gcc and g++ exist and cc links to gcc
+- Recovered and remounted the LFS image after a host reboot
 
-Builds were run with the Nimbus Phase 1 package runner as the `lfs` user.
-Successful build times and logs are recorded under `$LFS/sources/.logs/`.
+### 2026-10-25 - Rav
+Phase 1: Chapter 7 start, Gettext
+- Recovered the LFS image after a host crash and restored the chroot support mounts (/dev, /dev/pts, /dev/shm, /proc, /sys, /run)
+- Added `tools/phase1/recipes/ch7/gettext.sh` (run as root inside the chroot, not through the Chapter 6 runner)
+- Created /tmp inside the chroot with mode 1777 after configure could not create a temporary directory
+- Built Gettext 1.0 inside the chroot and copied msgfmt, msgmerge and xgettext into /usr/bin; all three verified
+- Added `tools/phase1/recipes/ch7/bison.sh` (build not confirmed)
 
-### 2026-10-25 — Phase 1 recovery and toolchain progress
-- Recovered the existing LFS build image after a host crash; filesystem check completed cleanly.
-- Confirmed successful Chapter 6 builds: Patch (21s), Sed (31s), Tar (40s), and XZ (23s).
-- Added the Binutils Pass 2 recipe and confirmed its build succeeded.
-- Added the GCC Pass 2 recipe; corrected MPFR, GMP, and MPC archive lookup to use the Nimbus package runner.
-- GCC Pass 2 build remains pending.
-
-### 2026-10-25 — GCC Pass 2 completed
-- Completed the GCC Pass 2 recipe; build runner recorded 1577 seconds.
-- Verified /mnt/lfs/usr/bin/gcc and g++ exist, and cc links to gcc.
-- Recovered the existing LFS build image after a host reboot and remounted it.
-
-### 2026-10-25 — Recovery and Chapter 7 Gettext preparation
-- Recovered the LFS build image after a host crash and remounted it at /mnt/lfs.
-- Restored the chroot support mounts: /dev, /dev/pts, /dev/shm, /proc, /sys, and /run.
-- Added an initial Chapter 7 Gettext script at tools/phase1/recipes/ch7/gettext.sh; build not yet run.
-
-### 2026-10-25 — Gettext Chapter 7 build completed
-- Created and syntax-checked the Chapter 7 Gettext build script.
-- Restored the LFS image and chroot support mounts after a host crash.
-- Created /tmp inside chroot with mode 1777 after configure could not create a temporary directory.
-- Built Gettext-1.0 inside chroot and copied msgfmt, msgmerge, and xgettext into /usr/bin.
-- Verified all three tools exist; build completed successfully.
-
-### 2026-10-25 — Gettext Chapter 7 build completed
-- Created and syntax-checked the Chapter 7 Gettext build script.
-- Restored the LFS image and chroot support mounts after a host crash.
-- Created /tmp inside chroot with mode 1777 after configure could not create a temporary directory.
-- Built Gettext-1.0 inside chroot and copied msgfmt, msgmerge, and xgettext into /usr/bin.
-- Verified all three tools exist; build completed successfully.
+### 2026-10-26 - Rav
+Docs tidy-up
+- UPDATELOG: removed a duplicated Gettext entry, filled in the missing build times (bash, coreutils, diffutils, file, binutils pass 2), made the headings consistent, and marked three old notes as resolved (the cttyhack plan and the poweroff/halt gap were fixed on 2026-10-22; the Chapter 6 config.site item needs no action)
+- DESIGN.MD: roadmap now shows status, decisions recorded (LFS 13.1 systemd edition, glibc), open decisions updated, hardware-targets section rewritten with the build host facts and the questions still to decide
+- README.md: added the Phase 1 section and layout rows
+- Added `docs/PHASE1.md`, a runbook for the LFS-style build (recovery after a reboot, running a recipe, chroot safety rules, chapter status, lessons learned)

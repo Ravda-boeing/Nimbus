@@ -39,9 +39,21 @@ To boot a different kernel (for testing): `NIMBUS_KERNEL=/path/to/kernel make ru
 | `rootfs/` | the Nimbus root filesystem |
 | `packages/` | `.npskg` packages |
 | `tools/` | build scripts (`make` calls these) |
+| `tools/phase1/` | scripts and recipes for the LFS-style base system (see `docs/PHASE1.md`) |
 | `docs/` | design notes and the update log |
 | `attic/` | old from-scratch init/shell experiments, kept for reference |
 | `build/` | generated images (not tracked) |
+
+## Phase 1: the LFS-style base system
+
+Phase 1 builds a full toolchain and base system with the LFS 13.1 (systemd)
+book, on a loop-mounted build disk at `/mnt/lfs`. Each package is a small
+recipe under `tools/phase1/recipes/`, built by `tools/phase1/build-pkg.sh` as the
+`lfs` user. Chapters 5 and 6 are built; Chapter 7 is in progress.
+
+**Read `docs/PHASE1.md` before touching `/mnt/lfs`.** It covers recovering after
+a reboot (the build disk and chroot mounts do not survive one) and the safety
+rules for the chroot steps.
 
 ## Known gaps
 

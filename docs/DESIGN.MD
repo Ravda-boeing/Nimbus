@@ -12,29 +12,41 @@ The project is for learning first. Taking the long road is the point.
 
 - 2026-10-21: Build from scratch (LFS/BLFS style), not as a Debian/Ubuntu
   derivative.
+- 2026-10-22: Phase 1 follows the LFS 13.1 **systemd** edition. Chosen as the
+  default because Mint-style desktops assume systemd; not yet confirmed as the
+  long-term choice (see Open decisions).
+- 2026-10-22: C library is **glibc**, as in LFS. musl is not planned.
 
 ## Components
 
 - Linux kernel 7.2.8, own defconfig (`kernel-config/nimbus_defconfig`)
-- Nimbus init (PID 1), currently a shell script with `/etc/init.d` services
-- BusyBox for the base userland, to be replaced piece by piece
+- Nimbus 0.1 init (PID 1): a shell script with `/etc/init.d` services, on a
+  BusyBox rootfs. This is the small system that boots in QEMU today.
+- The LFS-style base system, built in Phase 1 under `/mnt/lfs` (see
+  `docs/PHASE1.md`). It will replace the BusyBox rootfs.
 - `.npskg` package format and package manager (planned)
 - Nimbus filesystem layout (`rootfs/`)
 
-## Boot flow (Nimbus 0.1)
+## Boot flow (Nimbus 0.1, BusyBox rootfs)
 
 1. Kernel loads `initramfs.img` and runs `/init`.
 2. `/init` mounts /dev /proc /sys, reads `root=` from the kernel command line,
    mounts the real root at /mnt/root and `switch_root`s into it.
-3. `/sbin/init` runs the `/etc/init.d/*` scripts in name order, then starts
-   `/bin/login`.
+3. `/sbin/init` runs the `/etc/init.d/*` scripts in name order, then keeps
+   running as PID 1 and starts `/bin/login` in its own session, restarting it
+   after every logout.
 
-## Roadmap
+## Roadmap and status
 
 - **Phase 0 - Foundation.** Working QEMU boot, repo cleanup, build scripts.
-- **Phase 1 - Toolchain and base system.** Cross-toolchain (binutils, GCC,
-  glibc), then core userland (coreutils, bash, util-linux...), built in a clean
-  chroot.
+  *Done.*
+- **Phase 1 - Toolchain and base system** (LFS 13.1 systemd). *In progress.*
+  - Chapter 5, cross-toolchain: done.
+  - Chapter 6, cross-compiled temporary tools: done.
+  - Chapter 7, chroot and more temporary tools: started (Gettext built;
+    Bison, Perl, Python, Texinfo, Util-linux and cleanup remaining).
+  - Chapters 8 to 11, the real base system, configuration, kernel and
+    bootloader: not started.
 - **Phase 2 - Package manager.** `.npskg` build recipes, dependencies,
   install/remove, file manifests. Needed before most later packages.
 - **Phase 3 - System services.** Device management, users and login,
@@ -46,9 +58,27 @@ The project is for learning first. Taking the long road is the point.
 
 ## Open decisions
 
-- Init system: grow our own, port OpenRC/runit, or use systemd.
-- C library: glibc (what desktop software expects) or musl (smaller).
+- Init system: Phase 1 uses systemd (LFS systemd edition). Keep it long term,
+  or write/port something else later (our own init, OpenRC, runit)? Decide
+  before Phase 3.
+- Package manager design: format of `.npskg`, how dependencies and file
+  manifests are tracked, how it relates to the Phase 1 recipes.
+- Whether the Phase 1 recipes become the source of truth for the package
+  manager, or are only the bootstrap.
 
 ## Hardware targets
 
-TODO: write down the minimum and recommended CPU, GPU, RAM and disk.
+Not decided yet. Facts so far:
+
+- Build and test host: Acer Veriton X4620G, Intel Core i5-3470 (4 cores),
+  about 7 GB RAM, Linux Mint 22 (Ubuntu 24.04 base). A first-time LFS-style
+  build here takes a few hours of CPU time in total (GCC pass 1 took about 17
+  minutes, GCC pass 2 about 26).
+- Nimbus boots as a virtual machine under QEMU (virtio disk, serial console).
+
+To decide, and then write down here:
+
+- Minimum CPU generation and architecture features (x86_64 only?).
+- GPU: which drivers are in scope for Phase 4.
+- UEFI only, or BIOS as well?
+- Minimum RAM and disk for the installed system.
