@@ -183,3 +183,8 @@ Docs tidy-up
 - DESIGN.MD: roadmap now shows status, decisions recorded (LFS 13.1 systemd edition, glibc), open decisions updated, hardware-targets section rewritten with the build host facts and the questions still to decide
 - README.md: added the Phase 1 section and layout rows
 - Added `docs/PHASE1.md`, a runbook for the LFS-style build (recovery after a reboot, running a recipe, chroot safety rules, chapter status, lessons learned)
+
+### 2026-10-26 - Rav
+Phase 2 design draft
+- Added `docs/PACKAGES.md`: draft design for the `.npskg` package manager (recipe vs package, package file layout, installed database, command set, install/remove safety rules, recipe format v2, and when to start tracking: between chapter 7 and chapter 8). Decisions for Rav are marked in the document; nothing is implemented yet
+- DESIGN.MD: the Phase 2 roadmap entry now points to it

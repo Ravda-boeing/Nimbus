@@ -48,7 +48,8 @@ The project is for learning first. Taking the long road is the point.
   - Chapters 8 to 11, the real base system, configuration, kernel and
     bootloader: not started.
 - **Phase 2 - Package manager.** `.npskg` build recipes, dependencies,
-  install/remove, file manifests. Needed before most later packages.
+  install/remove, file manifests. Needed before most later packages. Draft
+  design: `docs/PACKAGES.md`.
 - **Phase 3 - System services.** Device management, users and login,
   networking, logging.
 - **Phase 4 - Graphics.** Kernel DRM, Mesa, fonts, Xorg or Wayland.
