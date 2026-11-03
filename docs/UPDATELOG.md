@@ -184,7 +184,16 @@ Docs tidy-up
 - README.md: added the Phase 1 section and layout rows
 - Added `docs/PHASE1.md`, a runbook for the LFS-style build (recovery after a reboot, running a recipe, chroot safety rules, chapter status, lessons learned)
 
-### 2026-10-26 - Rav
+### 2026-10-31 - Rav
 Phase 2 design draft
 - Added `docs/PACKAGES.md`: draft design for the `.npskg` package manager (recipe vs package, package file layout, installed database, command set, install/remove safety rules, recipe format v2, and when to start tracking: between chapter 7 and chapter 8). Decisions for Rav are marked in the document; nothing is implemented yet
 - DESIGN.MD: the Phase 2 roadmap entry now points to it
+
+### 2026-11-02 - Rav
+Phase 2: npskg prototype
+- Decided (2026-10-31): the package manager is written in Bash, and package tracking starts before chapter 8
+- Added `tools/npskg/npskg` v0.1: `build`, `pack`, `install`, `remove`, `list`, `info`, `files`, `owns`, `verify`, with `--root` and `--force`
+- Added `tools/npskg/test.sh`: 87 checks, no root needed (installs, dependencies and version constraints, `Provides`/`Conflicts`/`Replaces`, removal, verify, tampered packages, escape through a symlink, script failures, rollback, building from a recipe)
+- Found by the tests: GNU tar silently replaces a file with a directory, so `npskg` now refuses any file/directory collision even with `--force`
+- Not done: upgrades, config-file handling, converting the Phase 1 recipes to `package()`, running it inside the chroot
+- `docs/PACKAGES.md` updated with the decisions and a description of the prototype; DESIGN.MD and README.md point to it

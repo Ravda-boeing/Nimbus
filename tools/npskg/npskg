@@ -1,0 +1,411 @@
+#!/bin/bash
+# npskg: the Nimbus package manager. Version 0.1 (prototype, written in Bash).
+# Design: docs/PACKAGES.md
+#
+#   npskg [options] build   <recipe.sh>           build a recipe into a .npskg file
+#   npskg [options] pack    <META> <stage> [scripts-dir]   make a .npskg from a staged tree
+#   npskg [options] install <file.npskg>          install a package
+#   npskg [options] remove  <name>                remove an installed package
+#   npskg [options] list                          installed packages
+#   npskg [options] info    <name>                show a package's META
+#   npskg [options] files   <name>                files a package owns
+#   npskg [options] owns    <path>                which package owns a path
+#   npskg [options] verify  <name>                check installed files against their records
+#
+# Options:  --root DIR   operate on the system under DIR (default /)
+#           --force      install over unowned files / remove despite dependents
+#           --out DIR    where `build` and `pack` write the .npskg (default .)
+#
+# Environment for `build`: NPSKG_SOURCES (tarballs, default /sources),
+#                          NPSKG_WORK (scratch space, default /var/tmp/npskg)
+set -euo pipefail
+shopt -s nullglob
+export LC_ALL=C
+
+NPSKG_VERSION=0.1
+ROOT=/
+FORCE=0
+OUT=.
+args=()
+TMP=""
+LOCKED=0
+
+die() { echo "npskg: $*" >&2; exit 1; }
+say() { echo "npskg: $*"; }
+usage() { sed -n '2,22p' "$0"; exit 1; }
+
+cleanup() {
+    [ -z "$TMP" ] || rm -rf -- "$TMP"
+    if [ "$LOCKED" = 1 ]; then rmdir "$DB/lock" 2>/dev/null || true; fi
+}
+trap cleanup EXIT
+
+# ---------------------------------------------------------------- options
+while [ $# -gt 0 ]; do
+    case $1 in
+        --root)   [ $# -ge 2 ] || die "--root needs a directory"; ROOT=$2; shift 2 ;;
+        --root=*) ROOT=${1#--root=}; shift ;;
+        --force)  FORCE=1; shift ;;
+        --out)    [ $# -ge 2 ] || die "--out needs a directory"; OUT=$2; shift 2 ;;
+        --out=*)  OUT=${1#--out=}; shift ;;
+        -h|--help) usage ;;
+        --)       shift; args+=("$@"); break ;;
+        -*)       die "unknown option: $1" ;;
+        *)        args+=("$1"); shift ;;
+    esac
+done
+[ "${#args[@]}" -ge 1 ] || usage
+cmd=${args[0]}; args=("${args[@]:1}")
+
+[ -d "$ROOT" ] || die "root directory does not exist: $ROOT"
+ROOT=$(realpath -- "$ROOT")
+if [ "$ROOT" = / ]; then RP=""; else RP=$ROOT; fi
+DB="$RP/var/lib/npskg"
+
+# ---------------------------------------------------------------- helpers
+meta_get() { sed -n "s/^$2:[[:space:]]*//p" "$1" | head -n1; }
+
+list_items() {   # "a, b (>= 1)"  ->  one item per line
+    printf '%s\n' "$1" | tr ',' '\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d'
+}
+
+valid_name()    { [[ $1 =~ ^[a-z0-9][a-z0-9+._-]*$ ]]; }
+valid_version() { [[ $1 =~ ^[0-9A-Za-z][0-9A-Za-z.+_~-]*$ ]]; }
+
+bad_path() {     # true (0) if the path is NOT acceptable inside a package
+    case $1 in /*) ;; *) return 0 ;; esac
+    [ "$1" != / ] || return 0
+    case $1 in *$'\n'*|*$'\t'*) return 0 ;; esac
+    case "$1/" in */../*|*/./*|*//*) return 0 ;; esac
+    return 1
+}
+
+ver_ge() { [ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -n1)" = "$2" ]; }   # $1 >= $2
+ver_ok() {       # have op want
+    case $2 in
+        '>=') ver_ge "$1" "$3" ;;
+        '<=') ver_ge "$3" "$1" ;;
+        '=')  [ "$1" = "$3" ] ;;
+        '>>') ver_ge "$1" "$3" && [ "$1" != "$3" ] ;;
+        '<<') ver_ge "$3" "$1" && [ "$1" != "$3" ] ;;
+        *)    die "unknown version operator: $2" ;;
+    esac
+}
+
+installed_version() { meta_get "$DB/installed/$1/META" Version; }
+
+is_provided() {  # true if package $1 is installed, or some installed package Provides it
+    local want=$1 d
+    [ -d "$DB/installed/$want" ] && return 0
+    for d in "$DB"/installed/*/; do
+        list_items "$(meta_get "${d}META" Provides)" | sed 's/[[:space:]].*//' | grep -x -- "$want" >/dev/null && return 0
+    done
+    return 1
+}
+
+lock() {
+    mkdir -p "$DB/installed"
+    mkdir "$DB/lock" 2>/dev/null || die "another npskg seems to be running (remove $DB/lock if it is stale)"
+    LOCKED=1
+}
+
+gen_files() {    # stage dir -> FILES lines (type, mode, hash|target|-, path), sorted
+    local stage=$1 p rel
+    ( cd "$stage" && find . -mindepth 1 -print0 | sort -z | while IFS= read -r -d '' p; do
+        rel=${p#.}
+        bad_path "$rel" && die "unsupported path in package: $rel"
+        if   [ -L "$p" ]; then printf 'l\t%s\t%s\t%s\n' "$(stat -c %a -- "$p")" "$(readlink -- "$p")" "$rel"
+        elif [ -d "$p" ]; then printf 'd\t%s\t-\t%s\n'  "$(stat -c %a -- "$p")" "$rel"
+        elif [ -f "$p" ]; then printf 'f\t%s\t%s\t%s\n' "$(stat -c %a -- "$p")" "$(sha256sum -- "$p" | cut -d' ' -f1)" "$rel"
+        else die "unsupported file type: $rel"; fi
+    done )
+}
+
+# every directory a package writes into must resolve to a place inside the root
+# (matters with --root: an absolute symlink in the target tree would otherwise
+# lead outside of it)
+check_parents_inside() {   # FILES file
+    [ -n "$RP" ] || return 0
+    local d real
+    while IFS= read -r d; do
+        [ -n "$d" ] || continue
+        real=$(realpath -m -- "$RP$d")
+        case $real in
+            "$ROOT"|"$ROOT"/*) ;;
+            *) die "refusing: $d resolves to $real, outside the root $ROOT" ;;
+        esac
+    done < <(awk -F'\t' '{print $4}' "$1" | sed -e 's#/[^/]*$##' | sort -u)
+}
+
+run_script() {   # script-file name
+    [ -s "$1" ] || return 0
+    NPSKG_ROOT="$ROOT" /bin/sh "$1"
+}
+
+# ---------------------------------------------------------------- make a package
+make_package() {   # meta stage scripts-dir(or empty) outdir
+    local meta=$1 stage=$2 scripts=$3 out=$4 name ver w s
+    [ -f "$meta" ] || die "no such META file: $meta"
+    [ -d "$stage" ] || die "no such stage directory: $stage"
+    name=$(meta_get "$meta" Name); ver=$(meta_get "$meta" Version)
+    valid_name "$name"    || die "bad or missing Name in $meta"
+    valid_version "$ver"  || die "bad or missing Version in $meta"
+    mkdir -p "$out"
+    w=$(mktemp -d); TMP=$w
+    # the packaged META has no Files: list; the generated FILES replaces it
+    awk 'BEGIN{skip=0} /^Files:/{skip=1; next} skip && /^[[:space:]]/{next} {skip=0; print}' "$meta" > "$w/META"
+    gen_files "$stage" > "$w/FILES"
+    mkdir -p "$w/SCRIPTS"
+    if [ -n "$scripts" ]; then
+        for s in preinst postinst prerm postrm; do
+            if [ -f "$scripts/$s" ]; then cp -- "$scripts/$s" "$w/SCRIPTS/$s"; fi
+        done
+    fi
+    cp -a -- "$stage" "$w/data"
+    tar -C "$w" --owner=0 --group=0 --numeric-owner -cJf "$out/$name-$ver.npskg" META FILES SCRIPTS data
+    say "wrote $out/$name-$ver.npskg ($(wc -l < "$w/FILES") entries)"
+    rm -rf -- "$w"; TMP=""
+}
+
+cmd_pack() {
+    [ "${#args[@]}" -ge 2 ] || usage
+    make_package "${args[0]}" "${args[1]}" "${args[2]:-}" "$OUT"
+}
+
+cmd_build() {
+    [ "${#args[@]}" -eq 1 ] || usage
+    local recipe src_dir work
+    recipe=$(realpath -- "${args[0]}"); [ -f "$recipe" ] || die "no such recipe: ${args[0]}"
+    work="${NPSKG_WORK:-/var/tmp/npskg}"
+    mkdir -p "$work"; work=$(mktemp -d "$work/build.XXXXXX"); TMP=$work
+    (
+        set -euo pipefail
+        NPSKG_SOURCES="${NPSKG_SOURCES:-/sources}"
+        tarball_path() {
+            local m=( "$NPSKG_SOURCES"/$1 )
+            [ "${#m[@]}" -eq 1 ] || { echo "npskg: expected exactly one file matching $1 in $NPSKG_SOURCES, found ${#m[@]}" >&2; return 1; }
+            printf '%s\n' "${m[0]}"
+        }
+        unset NAME VERSION TARBALL SUMMARY DESCRIPTION LICENSE SECTION MAINTAINER
+        DEPENDS=(); CONFLICTS=(); PROVIDES=(); REPLACES=()
+        # shellcheck disable=SC1090
+        source "$recipe"
+        valid_name "${NAME:-}"       || die "recipe must set NAME"
+        valid_version "${VERSION:-}" || die "recipe must set VERSION"
+        declare -F package >/dev/null || die "recipe must define package()"
+        export PKGDIR="$work/stage"; mkdir -p "$PKGDIR"
+        src_dir="$work/src"; mkdir -p "$src_dir"
+        if [ -n "${TARBALL:-}" ]; then
+            tb=$(tarball_path "$TARBALL")
+            tar -xf "$tb" -C "$src_dir" --strip-components=1
+        fi
+        cd "$src_dir"
+        if declare -F build >/dev/null; then build; fi
+        package
+        {
+            echo "Name: $NAME"
+            echo "Version: $VERSION"
+            echo "Architecture: $(uname -m)"
+            [ -z "${SUMMARY:-}" ]     || echo "Summary: $SUMMARY"
+            [ -z "${DESCRIPTION:-}" ] || echo "Description: $DESCRIPTION"
+            [ -z "${MAINTAINER:-}" ]  || echo "Maintainer: $MAINTAINER"
+            [ -z "${LICENSE:-}" ]     || echo "License: $LICENSE"
+            [ -z "${SECTION:-}" ]     || echo "Section: $SECTION"
+            [ "${#DEPENDS[@]}"   -eq 0 ] || echo "Depends: $(IFS=,; echo "${DEPENDS[*]}" | sed 's/,/, /g')"
+            [ "${#CONFLICTS[@]}" -eq 0 ] || echo "Conflicts: $(IFS=,; echo "${CONFLICTS[*]}" | sed 's/,/, /g')"
+            [ "${#PROVIDES[@]}"  -eq 0 ] || echo "Provides: $(IFS=,; echo "${PROVIDES[*]}" | sed 's/,/, /g')"
+            [ "${#REPLACES[@]}"  -eq 0 ] || echo "Replaces: $(IFS=,; echo "${REPLACES[*]}" | sed 's/,/, /g')"
+        } > "$work/META"
+        scripts=""
+        if declare -F scripts_dir >/dev/null; then scripts=$(scripts_dir); fi
+        make_package "$work/META" "$PKGDIR" "$scripts" "$OUT"
+    )
+    rm -rf -- "$work"; TMP=""
+}
+
+# ---------------------------------------------------------------- install
+cmd_install() {
+    [ "${#args[@]}" -eq 1 ] || usage
+    local pkg=${args[0]} name version t dep item dname op want have missing
+    local re_constraint='\(([<>=]+)[[:space:]]*([^)]+)\)'
+    [ -f "$pkg" ] || die "no such file: $pkg"
+    lock
+    TMP=$(mktemp -d "$DB/tmp.XXXXXX"); t=$TMP
+    tar -xpf "$pkg" -C "$t" || die "cannot unpack $pkg"
+    [ -f "$t/META" ] && [ -f "$t/FILES" ] && [ -d "$t/data" ] || die "$pkg is not a valid .npskg (needs META, FILES, data/)"
+    name=$(meta_get "$t/META" Name); version=$(meta_get "$t/META" Version)
+    valid_name "$name"   || die "bad package Name: $name"
+    valid_version "$version" || die "bad package Version: $version"
+    [ ! -d "$DB/installed/$name" ] || die "$name $(installed_version "$name") is already installed (upgrading is not implemented yet: remove it first)"
+
+    # dependencies and conflicts
+    missing=""
+    while IFS= read -r item; do
+        dname=${item%% *}
+        if ! is_provided "$dname"; then missing="$missing $dname"; continue; fi
+        if [[ $item =~ $re_constraint ]] && [ -d "$DB/installed/$dname" ]; then
+            op=${BASH_REMATCH[1]}; want=${BASH_REMATCH[2]}; have=$(installed_version "$dname")
+            ver_ok "$have" "$op" "$want" || missing="$missing $dname($op $want, have $have)"
+        fi
+    done < <(list_items "$(meta_get "$t/META" Depends)")
+    [ -z "$missing" ] || die "unmet dependencies:$missing"
+    while IFS= read -r item; do
+        dname=${item%% *}
+        ! is_provided "$dname" || die "$name conflicts with installed package: $dname"
+    done < <(list_items "$(meta_get "$t/META" Conflicts)")
+
+    # the FILES record must be well formed, and must match the data actually in the archive
+    awk -F'\t' 'NF!=4 || ($1!="f" && $1!="d" && $1!="l") {exit 1}' "$t/FILES" || die "malformed FILES record in $pkg"
+    local p
+    while IFS= read -r p; do bad_path "$p" && die "unsafe path in package: $p"; done < <(awk -F'\t' '{print $4}' "$t/FILES")
+    gen_files "$t/data" > "$t/FILES.check"
+    cmp -s "$t/FILES" "$t/FILES.check" || die "the archive contents do not match its FILES record (corrupt or tampered package)"
+    check_parents_inside "$t/FILES"
+
+    # file ownership: another package's file is a conflict unless we Replaces its owner
+    local owners=( "$DB"/installed/*/FILES ) replaces conflicts="" owner path
+    replaces=$(list_items "$(meta_get "$t/META" Replaces)" | sed 's/[[:space:]].*//')
+    if [ "${#owners[@]}" -gt 0 ]; then
+        while IFS=$'\t' read -r owner path; do
+            if printf '%s\n' "$replaces" | grep -x -- "$owner" >/dev/null; then
+                printf '%s\t%s\n' "$owner" "$path" >> "$t/steal"
+            else
+                conflicts="$conflicts
+  $path (owned by $owner)"
+            fi
+        done < <(awk -F'\t' 'FNR==NR { if ($1!="d") mine[$4]=1; next }
+                              ($1!="d") && ($4 in mine) { n=FILENAME; sub(/\/FILES$/,"",n); sub(/.*\//,"",n); print n "\t" $4 }' \
+                       "$t/FILES" "${owners[@]}")
+    fi
+    [ -z "$conflicts" ] || die "file conflicts with installed packages:$conflicts"
+
+    # existing files nobody owns (for example from the temporary toolchain)
+    : > "$t/new_files"; : > "$t/new_dirs"; : > "$t/steal.paths"
+    if [ -f "$t/steal" ]; then cut -f2 "$t/steal" > "$t/steal.paths"; fi
+    local ty unowned="" collide=""
+    while IFS=$'\t' read -r ty path; do
+        if [ -e "$RP$path" ] || [ -L "$RP$path" ]; then
+            # a different kind of thing in the way is never overwritten, not even with --force
+            if [ "$ty" = d ]; then
+                [ -d "$RP$path" ] || collide="$collide
+  $path (the package needs a directory, but something else is there)"
+            elif [ -d "$RP$path" ] && [ ! -L "$RP$path" ]; then
+                collide="$collide
+  $path (the package has a file or link here, but there is a directory)"
+            fi
+            if [ "$ty" != d ] && ! grep -x -- "$path" "$t/steal.paths" >/dev/null 2>&1; then
+                if [ "$FORCE" != 1 ]; then unowned="$unowned
+  $path"; fi
+            fi
+        else
+            if [ "$ty" = d ]; then echo "$path" >> "$t/new_dirs"; else echo "$path" >> "$t/new_files"; fi
+        fi
+    done < <(awk -F'\t' '{print $1 "\t" $4}' "$t/FILES")
+    [ -z "$collide" ] || die "refusing, these paths are in the way (--force does not replace them):$(printf '%s' "$collide" | head -n 8)"
+    [ -z "$unowned" ] || die "files that exist but are owned by no package (use --force to overwrite):$(printf '%s' "$unowned" | head -n 8)"
+
+    mkdir -p "$t/SCRIPTS"
+    run_script "$t/SCRIPTS/preinst" || die "preinst failed; nothing was installed"
+
+    # install the files
+    if ! tar -C "$t/data" -cf - . | tar -C "${RP:-/}" -xpf - --no-overwrite-dir --keep-directory-symlink; then
+        say "extraction failed; undoing"
+        while IFS= read -r path; do rm -f -- "$RP$path"; done < "$t/new_files"
+        sort -r "$t/new_dirs" | while IFS= read -r path; do rmdir -- "$RP$path" 2>/dev/null || true; done
+        die "install of $name failed; the new files were removed"
+    fi
+
+    # record ownership last
+    mkdir -p "$DB/installed/$name"
+    cp -- "$t/META" "$t/FILES" "$DB/installed/$name/"
+    cp -a -- "$t/SCRIPTS" "$DB/installed/$name/SCRIPTS"
+    # files taken over from another package leave that package's record
+    if [ -f "$t/steal" ]; then
+        while IFS=$'\t' read -r owner path; do
+            P="$path" awk -F'\t' '$4!=ENVIRON["P"]' "$DB/installed/$owner/FILES" > "$DB/installed/$owner/FILES.new"
+            mv -- "$DB/installed/$owner/FILES.new" "$DB/installed/$owner/FILES"
+        done < "$t/steal"
+    fi
+    say "installed $name $version"
+    run_script "$t/SCRIPTS/postinst" || { echo "npskg: warning: postinst of $name failed (the package IS installed)" >&2; return 1; }
+}
+
+# ---------------------------------------------------------------- remove
+cmd_remove() {
+    [ "${#args[@]}" -eq 1 ] || usage
+    local name=${args[0]} d dep dn users="" path rec
+    rec="$DB/installed/$name"
+    [ -d "$rec" ] || die "$name is not installed"
+    lock
+    for d in "$DB"/installed/*/; do
+        dn=$(basename "$d"); [ "$dn" != "$name" ] || continue
+        while IFS= read -r dep; do
+            [ "${dep%% *}" = "$name" ] && users="$users $dn"
+        done < <(list_items "$(meta_get "${d}META" Depends)")
+    done
+    if [ -n "$users" ] && [ "$FORCE" != 1 ]; then die "cannot remove $name: required by:$users (use --force to override)"; fi
+    while IFS= read -r path; do bad_path "$path" && die "unsafe path in the record of $name: $path"; done < <(awk -F'\t' '{print $4}' "$rec/FILES")
+    check_parents_inside "$rec/FILES"
+    run_script "$rec/SCRIPTS/prerm" || die "prerm failed; $name was not removed"
+    awk -F'\t' '$1!="d"{print $4}' "$rec/FILES" | while IFS= read -r path; do rm -f -- "$RP$path"; done
+    awk -F'\t' '$1=="d"{print $4}' "$rec/FILES" | sort -r | while IFS= read -r path; do rmdir -- "$RP$path" 2>/dev/null || true; done
+    run_script "$rec/SCRIPTS/postrm" || echo "npskg: warning: postrm of $name failed" >&2
+    rm -rf -- "$rec"
+    say "removed $name"
+}
+
+# ---------------------------------------------------------------- queries
+cmd_list() {
+    local d
+    for d in "$DB"/installed/*/; do
+        printf '%s %s\n' "$(basename "$d")" "$(meta_get "${d}META" Version)"
+    done
+}
+cmd_info()  { [ "${#args[@]}" -eq 1 ] || usage; [ -d "$DB/installed/${args[0]}" ] || die "${args[0]} is not installed"; cat "$DB/installed/${args[0]}/META"; }
+cmd_files() { [ "${#args[@]}" -eq 1 ] || usage; [ -d "$DB/installed/${args[0]}" ] || die "${args[0]} is not installed"; awk -F'\t' '{print $4}' "$DB/installed/${args[0]}/FILES"; }
+
+cmd_owns() {
+    [ "${#args[@]}" -eq 1 ] || usage
+    local f found=1
+    case ${args[0]} in /*) ;; *) die "give an absolute path, like /usr/bin/xz" ;; esac
+    for f in "$DB"/installed/*/FILES; do
+        if P="${args[0]}" awk -F'\t' '$4==ENVIRON["P"]{f=1} END{exit !f}' "$f"; then
+            basename "$(dirname "$f")"; found=0
+        fi
+    done
+    return $found
+}
+
+cmd_verify() {
+    [ "${#args[@]}" -eq 1 ] || usage
+    local name=${args[0]} rec ty mode extra path cur bad=0 n=0
+    rec="$DB/installed/$name"; [ -d "$rec" ] || die "$name is not installed"
+    while IFS=$'\t' read -r ty mode extra path; do
+        n=$((n+1))
+        case $ty in
+            f) if [ ! -f "$RP$path" ] || [ -L "$RP$path" ]; then echo "MISSING:  $path"; bad=$((bad+1))
+               elif [ "$(sha256sum -- "$RP$path" | cut -d' ' -f1)" != "$extra" ]; then echo "MODIFIED: $path"; bad=$((bad+1))
+               elif [ "$(stat -c %a -- "$RP$path")" != "$mode" ]; then echo "MODE:     $path (is $(stat -c %a -- "$RP$path"), should be $mode)"; bad=$((bad+1)); fi ;;
+            l) cur=$(readlink -- "$RP$path" 2>/dev/null || true)
+               if [ -z "$cur" ]; then echo "MISSING:  $path (symlink)"; bad=$((bad+1))
+               elif [ "$cur" != "$extra" ]; then echo "CHANGED:  $path (points to $cur, should be $extra)"; bad=$((bad+1)); fi ;;
+            d) [ -d "$RP$path" ] || { echo "MISSING:  $path (directory)"; bad=$((bad+1)); } ;;
+        esac
+    done < "$rec/FILES"
+    say "verify $name: $n entries, $bad problem(s)"
+    [ "$bad" -eq 0 ]
+}
+
+case $cmd in
+    build)   cmd_build ;;
+    pack)    cmd_pack ;;
+    install) cmd_install ;;
+    remove)  cmd_remove ;;
+    list)    cmd_list ;;
+    info)    cmd_info ;;
+    files)   cmd_files ;;
+    owns)    cmd_owns ;;
+    verify)  cmd_verify ;;
+    version) echo "npskg $NPSKG_VERSION" ;;
+    *)       usage ;;
+esac

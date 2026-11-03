@@ -16,6 +16,9 @@ The project is for learning first. Taking the long road is the point.
   default because Mint-style desktops assume systemd; not yet confirmed as the
   long-term choice (see Open decisions).
 - 2026-10-22: C library is **glibc**, as in LFS. musl is not planned.
+- 2026-10-31: The package manager (`npskg`) is written in **Bash** first, and
+  package tracking starts **before LFS chapter 8**, so every chapter 8 package is
+  built through it. See `docs/PACKAGES.md`.
 
 ## Components
 
@@ -49,7 +52,7 @@ The project is for learning first. Taking the long road is the point.
     bootloader: not started.
 - **Phase 2 - Package manager.** `.npskg` build recipes, dependencies,
   install/remove, file manifests. Needed before most later packages. Draft
-  design: `docs/PACKAGES.md`.
+  design and a working prototype: `docs/PACKAGES.md`, `tools/npskg/`.
 - **Phase 3 - System services.** Device management, users and login,
   networking, logging.
 - **Phase 4 - Graphics.** Kernel DRM, Mesa, fonts, Xorg or Wayland.

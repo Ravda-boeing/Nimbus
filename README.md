@@ -39,6 +39,7 @@ To boot a different kernel (for testing): `NIMBUS_KERNEL=/path/to/kernel make ru
 | `rootfs/` | the Nimbus root filesystem |
 | `packages/` | `.npskg` packages |
 | `tools/` | build scripts (`make` calls these) |
+| `tools/npskg/` | `npskg`, the Nimbus package manager (Bash prototype) and its tests |
 | `tools/phase1/` | scripts and recipes for the LFS-style base system (see `docs/PHASE1.md`) |
 | `docs/` | design notes and the update log |
 | `attic/` | old from-scratch init/shell experiments, kept for reference |

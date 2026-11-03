@@ -1,7 +1,9 @@
 # Package manager design (Phase 2) - DRAFT
 
-Status: a first draft for Rav to react to. Nothing here is built yet. Items
-marked **DECISION** are yours to make; the recommendation is mine.
+Status: design draft plus a working prototype (`tools/npskg/npskg`, v0.1, 87
+automated checks in `tools/npskg/test.sh`). Two decisions were made on
+2026-10-31: **Bash**, and **start tracking before chapter 8**. The rest of the
+"Decisions" list below is still open; the recommendation is marked on each.
 
 ## Why Phase 2 matters
 
@@ -136,14 +138,14 @@ chapter 7) Perl and Python. That points to the language decision below.
 
 ## Decisions (yours)
 
-1. **Implementation language.** *Recommend: Bash first.* It runs in the chroot
+1. **Implementation language.** **Decided 2026-10-31: Bash first.** It runs in the chroot
    with no extra build, it matches everything written so far, and a prototype is
    quick to test. Python is available after chapter 7 and gives easier data
    handling; C or Rust give speed and safety but a bigger build before you can use
    it. Rewriting later is an option once the design has settled.
 2. **Archive compression.** *Recommend: xz* (already in the base system; zstd
    would need an extra package early). Revisit when speed matters.
-3. **When to start tracking.** *Recommend: before chapter 8* (see above).
+3. **When to start tracking.** **Decided 2026-10-31: before chapter 8** (see above).
 4. **Dependency scope for v1.** *Recommend: check only, no resolver.*
 5. **Config file handling.** *Recommend: leave for v2.*
 6. **Repository, index and package signing.** *Recommend: later*, after the core
@@ -158,3 +160,55 @@ chapter 7) Perl and Python. That points to the language decision below.
 4. Dependency checks.
 5. Use it for chapter 8.
 6. Repository and upgrades.
+
+## The prototype (v0.1)
+
+`tools/npskg/npskg` is a single Bash script. It needs only what chapters 5 to 7
+install: Bash, Coreutils, Tar, Xz, Findutils, Gawk, Sed, Grep.
+
+```
+npskg [--root DIR] [--force] [--out DIR] <command> ...
+  build <recipe>        build a recipe (recipe format v2) into a .npskg
+  pack <META> <stage>   make a .npskg from a staged tree
+  install <file>        install; record ownership last
+  remove <name>         delete exactly the recorded files
+  list | info | files | owns | verify
+```
+
+How it keeps to the safety rules above (each one has a test):
+
+- **Tampered or broken packages are refused.** The archive's contents must match
+  its `FILES` record exactly (file list, modes, SHA-256), so nothing unlisted can
+  be installed and nothing can later be missed on removal. Paths with `..` or
+  tabs and newlines are refused.
+- **Nothing escapes `--root`.** Every directory a package writes into, or a
+  removal touches, must resolve to a place inside the root. An absolute symlink
+  in the target tree that leads outside it (such as `/var/run -> /run`) is
+  refused rather than followed.
+- **Things in the way are never replaced.** A file where the package needs a
+  directory, or a directory where it has a file, is refused even with `--force`.
+  (This came from a test: GNU tar would otherwise silently turn a file into a
+  directory.)
+- **Ownership is exclusive.** A file owned by another package is a conflict unless
+  `Replaces` allows it, in which case ownership moves. Existing files that no
+  package owns (for example from the temporary toolchain) are refused unless
+  `--force` is given; chapter 8 will need `--force` for exactly those.
+- **A failed install is undone.** Files and directories the install created are
+  removed; the record is written only after everything is in place.
+- **Remove touches only recorded files**, prunes only directories that become
+  empty, and refuses while another package depends on it (`--force` overrides).
+- Dependencies and `Conflicts` are checked, including version constraints
+  (`>=`, `<=`, `=`, `>>`, `<<`) and `Provides`. There is a lock against two runs.
+
+Run the tests (no root needed): `tools/npskg/test.sh`.
+
+### Not done yet
+
+- **Upgrades.** Installing a version over an installed one is refused: remove
+  first. Needed before there is any update mechanism.
+- Conffiles (editable config files), repositories, signing.
+- Everything is installed as root-owned; special files (devices, FIFOs) are not
+  supported. Hard links are recorded as separate entries.
+- Converting the Phase 1 recipes to the `package()` form (recipe format v2).
+- Trying it inside the chroot. It has only been exercised with fake packages in
+  temporary roots.
