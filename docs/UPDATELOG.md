@@ -197,3 +197,11 @@ Phase 2: npskg prototype
 - Found by the tests: GNU tar silently replaces a file with a directory, so `npskg` now refuses any file/directory collision even with `--force`
 - Not done: upgrades, config-file handling, converting the Phase 1 recipes to `package()`, running it inside the chroot
 - `docs/PACKAGES.md` updated with the decisions and a description of the prototype; DESIGN.MD and README.md point to it
+
+## 2026-11-03 — Phase 1: Chapter 7 Zlib and mpdecimal
+
+- Added the Zlib 1.3.2 Chapter 7 build recipe.
+- Added the mpdecimal 4.0.1 Chapter 7 build recipe.
+- Successfully built and installed both packages inside the LFS chroot.
+- Verified their shared libraries with `ldconfig -p`.
+- Verified the installed headers for Zlib and mpdecimal.
