@@ -212,3 +212,9 @@ Phase 2: npskg prototype
 - Successfully compiled and installed Python 3.14.7 inside the LFS chroot.
 - Verified `python3.14 --version` and `python3 --version` both report Python 3.14.7.
 - Verified `/usr/lib/libpython3.14.so.1.0` exists.
+
+### 2026-11-08 — Phase 1: Chapter 7 Texinfo
+
+- Added `tools/phase1/recipes/ch7/texinfo.sh` for Texinfo 7.3.
+- Successfully built and installed Texinfo inside the LFS chroot.
+- Verified `makeinfo`, `install-info`, and `texindex` all report version 7.3.
