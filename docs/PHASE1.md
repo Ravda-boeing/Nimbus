@@ -82,7 +82,7 @@ can touch the real Mint system.
   `chroot.sh check` compares the tree with sections 7.5 and 7.6 (read-only) and
   flags a stray `/usr/lib64`, which the book says must not exist.
 
-### Chapter 7 status (as of 2026-11-08; 7.2 to 7.6 were last checked on 2026-10-26)
+### Chapter 7 status (as of 2026-11-08)
 
 - 7.2 ownership: done (the tree is root-owned).
 - 7.3 / 7.4 mounts and chroot: gone after every reboot; use `chroot.sh`.
@@ -91,17 +91,21 @@ can touch the real Mint system.
   Run `chroot.sh check` for the full list.
 - 7.6 essential files: present (`passwd`, `group`, `hosts`, the `mtab` link and the
   four log files with the right modes).
+- 7.2 to 7.6 re-checked on 2026-11-08: `chroot.sh check` reports 84 OK, 0 problems
+  (on the Veriton, and again on the Aspire after moving the image).
 - Gettext: built and verified (2026-10-25).
-- Bison: installed; the recipe is in the repo but no verified build is logged.
-- Perl: installed per the 2026-10-26 check, but there is no recipe in the repo
-  and no UPDATELOG entry. Verify it, and add a recipe if it was built by hand.
+- Bison 3.8.2: installed; `bison --version` verified inside the chroot on
+  2026-11-08 (log: `bison-ch7.log`).
+- Perl 5.44.0: installed and verified on 2026-11-08 (`perl -V:prefix` is `/usr`,
+  `useshrplib` is true). It was built by hand, so `recipes/ch7/perl.sh` was
+  reconstructed afterwards; its vendor and sitearch settings are not yet checked.
 - Zlib 1.3.2 and mpdecimal 4.0.1: built and verified (2026-11-03). They are not
   in the list above from the book; the reason they were added is not recorded.
 - Python 3.14.7, Texinfo 7.3, Util-linux 2.42.2: built and verified (2026-11-08).
 - Cleanup: not started.
-- Section numbers: the status list used 7.10 Python, 7.11 Texinfo and
-  7.12 Util-linux, while the recipe headers say 7.12 and 7.14. Check against the
-  book and make them agree.
+- Section numbers: the recipe headers say Python 7.12, Texinfo 7.13 and
+  Util-linux 7.14, which fits the book having two more sections earlier than the
+  old status list assumed. Perl is then 7.11 (inferred, not yet checked against the book).
 
 ## Build status
 
@@ -168,9 +172,10 @@ nothing and says nothing.)
 
 ## Next
 
-1. Verify the chapter 7 state above (Perl and Bison in particular), then finish
-   7.5 and 7.6 as the book says if anything is still open.
-2. Do the chapter 7 cleanup, then back up the build image before chapter 8.
+1. Check the Perl recipe's vendor and sitearch settings against `perl -V:<name>`
+   and the book.
+2. Do the chapter 7 cleanup (a backup of the image exists as of 2026-11-08, but
+   take a fresh one right before the cleanup).
 3. Chapter 8: the real base system (many packages; the build disk will need to
    be larger, so plan to enlarge the image before the final GCC build).
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

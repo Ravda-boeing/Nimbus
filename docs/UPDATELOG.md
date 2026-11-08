@@ -230,3 +230,11 @@ Docs: bring Phase 1 status up to date
 - PHASE1.md: rewrote the chapter 7 status (Zlib, mpdecimal, Python, Texinfo and Util-linux are done; cleanup is not started), recorded that Perl and Bison have no verified build in the log, and updated the Next list
 - DESIGN.MD and README.md: chapter 7 now shown as nearly done, with only the cleanup remaining
 - Open: the Python and Util-linux recipe headers say 7.12 and 7.14, but the status list in PHASE1.md numbers them 7.10 and 7.12; check against the book
+
+### 2026-11-08 - Rav
+Phase 1: verified chapter 7 and added a Perl recipe
+- Ran `tools/phase1/chroot.sh check` on the Veriton and again on the Aspire after moving the build image there: 84 OK, 0 problems
+- Verified inside the chroot: Perl 5.44.0 (prefix `/usr`, `useshrplib` true), Bison 3.8.2, Gettext 1.0 (`msgfmt`), Python 3.14.7, Texinfo 7.3, Util-linux 2.42.2, and the zlib and mpdecimal libraries in `ldconfig -p`
+- Perl had been built by hand (`sh Configure -des -D useshrplib`, work directory `/sources/.work/perl-ch7`). Added `tools/phase1/recipes/ch7/perl.sh`, reconstructed from the installed settings; the vendor and sitearch settings still need checking
+- Build image: backed up (gzip, tested) to a USB drive, then unpacked onto an ext4 partition on that drive and mounted on the Aspire; `e2fsck` clean
+- PHASE1.md: status updated for Perl, Bison and 7.2 to 7.6; section numbers note and Next list updated
