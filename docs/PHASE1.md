@@ -102,10 +102,11 @@ can touch the real Mint system.
 - Zlib 1.3.2 and mpdecimal 4.0.1: built and verified (2026-11-03). They are not
   in the list above from the book; the reason they were added is not recorded.
 - Python 3.14.7, Texinfo 7.3, Util-linux 2.42.2: built and verified (2026-11-08).
-- Cleanup: not started.
+- Cleanup: `recipes/ch7/cleanup.sh` written (2026-11-08), not yet run.
 - Section numbers: the recipe headers say Python 7.12, Texinfo 7.13 and
   Util-linux 7.14, which fits the book having two more sections earlier than the
-  old status list assumed. Perl is then 7.11 (inferred, not yet checked against the book).
+  old status list assumed. The 13.1 book numbers the cleanup 7.15 (its table of
+  contents), which agrees with that. Perl is then 7.11 (inferred, not yet checked).
 
 ## Build status
 
@@ -174,8 +175,9 @@ nothing and says nothing.)
 
 1. Check the Perl recipe's vendor and sitearch settings against `perl -V:<name>`
    and the book.
-2. Do the chapter 7 cleanup (a backup of the image exists as of 2026-11-08, but
-   take a fresh one right before the cleanup).
+2. Run `recipes/ch7/cleanup.sh` inside the chroot. The tested gzip backup of the
+   image from 2026-11-08 is the "before cleanup" backup, as long as the image has
+   not been changed since.
 3. Chapter 8: the real base system (many packages; the build disk will need to
    be larger, so plan to enlarge the image before the final GCC build).
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

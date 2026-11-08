@@ -238,3 +238,11 @@ Phase 1: verified chapter 7 and added a Perl recipe
 - Perl had been built by hand (`sh Configure -des -D useshrplib`, work directory `/sources/.work/perl-ch7`). Added `tools/phase1/recipes/ch7/perl.sh`, reconstructed from the installed settings; the vendor and sitearch settings still need checking
 - Build image: backed up (gzip, tested) to a USB drive, then unpacked onto an ext4 partition on that drive and mounted on the Aspire; `e2fsck` clean
 - PHASE1.md: status updated for Perl, Bison and 7.2 to 7.6; section numbers note and Next list updated
+
+### 2026-11-08 - Rav
+Phase 1: chapter 7 cleanup recipe
+- Added `tools/phase1/recipes/ch7/cleanup.sh` (the "Cleaning" part of the book's section 7.15): removes the installed documentation under `/usr/share/{info,man,doc}`, the libtool `.la` files under `/usr/{lib,libexec}`, and `/tools`
+- It refuses to run unless it is root inside a chroot (our `/` must differ from PID 1's), and it checks for `/sources`, gcc and perl first
+- The commands come from the LFS 12.4 cleanup page and the book's development source; the 13.1 page has not been compared yet
+- Not run yet. The optional "Backup" part of the section is replaced by the gzip backup of the image taken from the host
+- PHASE1.md: the 13.1 book numbers this section 7.15, which fits the recipe header numbers (Python 7.12, Texinfo 7.13, Util-linux 7.14)
