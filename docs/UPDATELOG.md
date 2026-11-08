@@ -218,3 +218,12 @@ Phase 2: npskg prototype
 - Added `tools/phase1/recipes/ch7/texinfo.sh` for Texinfo 7.3.
 - Successfully built and installed Texinfo inside the LFS chroot.
 - Verified `makeinfo`, `install-info`, and `texindex` all report version 7.3.
+
+### 2026-11-08 — Phase 1: Prepare Util-linux
+
+- Added `tools/phase1/recipes/ch7/util-linux.sh` for Util-linux 2.42.2.
+- Recipe follows the LFS 13.1-systemd Chapter 7.14 temporary-tools instructions.
+- Build and installation verification pending.
+
+- Util-linux 2.42.2 build and installation completed successfully.
+- Verified `mount`, `blkid`, and `fdisk` all report Util-linux 2.42.2.
