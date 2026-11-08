@@ -178,6 +178,10 @@ nothing and says nothing.)
 1. Compare `recipes/ch7/perl.sh` and `recipes/ch7/cleanup.sh` with the book's
    13.1 pages.
 2. Back up the image again now that chapter 7 is complete.
-3. Chapter 8: the real base system (many packages; the build disk will need to
+3. Chapter 8 recipes live in `tools/phase1/recipes/ch8/` (format v2, built with
+   `npskg`). Copy `tools/npskg/` and the recipes into `$LFS/sources/` (as
+   `npskg/` and `nimbus/recipes/`), enter the chroot, then
+   `/sources/npskg/npskg --out /sources/pkgs build /sources/nimbus/recipes/ch8/<n>.sh`
+   and `npskg install` the result. Chapter 8: the real base system (many packages; the build disk will need to
    be larger, so plan to enlarge the image before the final GCC build).
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

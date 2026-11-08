@@ -254,3 +254,10 @@ Phase 1: chapter 7 cleanup run, chapter 7 complete
 - PHASE1.md, DESIGN.MD and README.md now show chapter 7 as done
 - Corrected the Perl notes: all Perl paths were checked, not only some of them (the earlier text still said the vendor and sitearch settings needed checking)
 - Next: back the image up again, compare the Perl and cleanup recipes with the book's 13.1 pages, then plan chapter 8 (enlarge the image first)
+
+### 2026-11-08 - Rav
+Phase 1/2: npskg checked in the chroot, first chapter 8 recipes
+- Ran `tools/npskg/test.sh` on the Aspire (87 passed, 0 failed) and again inside the LFS chroot from `/sources/npskg/` (87 passed, 0 failed), so npskg runs with only the chapter 7 tools
+- Grew the build image from 16 GB to 30 GB (`truncate`, `e2fsck -f`, `resize2fs`); 4.6 GB used after the cleanup. Backups of the image (gzip, tested) taken before and after the cleanup, kept on the USB drive
+- Added `tools/phase1/recipes/ch8/man-pages.sh` and `iana-etc.sh` in recipe format v2 (`package()` installs into the stage directory). Version numbers come from the tarball name in /sources. A dry run with stand-in tarballs built, installed, verified and gave correct ownership; not yet run with the real tarballs
+- The Man-pages install command is from the LFS 12.x page and has not been compared with the 13.1 page
