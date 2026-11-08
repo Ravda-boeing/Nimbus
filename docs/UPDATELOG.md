@@ -235,7 +235,7 @@ Docs: bring Phase 1 status up to date
 Phase 1: verified chapter 7 and added a Perl recipe
 - Ran `tools/phase1/chroot.sh check` on the Veriton and again on the Aspire after moving the build image there: 84 OK, 0 problems
 - Verified inside the chroot: Perl 5.44.0 (prefix `/usr`, `useshrplib` true), Bison 3.8.2, Gettext 1.0 (`msgfmt`), Python 3.14.7, Texinfo 7.3, Util-linux 2.42.2, and the zlib and mpdecimal libraries in `ldconfig -p`
-- Perl had been built by hand (`sh Configure -des -D useshrplib`, work directory `/sources/.work/perl-ch7`). Added `tools/phase1/recipes/ch7/perl.sh`, reconstructed from the installed settings; the vendor and sitearch settings still need checking
+- Perl had been built by hand (`sh Configure -des -D useshrplib`, work directory `/sources/.work/perl-ch7`). Added `tools/phase1/recipes/ch7/perl.sh`, reconstructed from the installed settings (prefix, vendorprefix, privlib, archlib, sitelib, sitearch, vendorlib, vendorarch and useshrplib all checked with `perl -V:<name>`); not yet compared with the book's page
 - Build image: backed up (gzip, tested) to a USB drive, then unpacked onto an ext4 partition on that drive and mounted on the Aspire; `e2fsck` clean
 - PHASE1.md: status updated for Perl, Bison and 7.2 to 7.6; section numbers note and Next list updated
 
@@ -246,3 +246,11 @@ Phase 1: chapter 7 cleanup recipe
 - The commands come from the LFS 12.4 cleanup page and the book's development source; the 13.1 page has not been compared yet
 - Not run yet. The optional "Backup" part of the section is replaced by the gzip backup of the image taken from the host
 - PHASE1.md: the 13.1 book numbers this section 7.15, which fits the recipe header numbers (Python 7.12, Texinfo 7.13, Util-linux 7.14)
+
+### 2026-11-08 - Rav
+Phase 1: chapter 7 cleanup run, chapter 7 complete
+- Ran `recipes/ch7/cleanup.sh` inside the chroot on the Aspire; it finished with "Cleanup Chapter 7 completed."
+- Verified afterwards: `/usr/share/doc` and `/usr/share/man` are empty, `/tools` no longer exists, and no `.la` files remain under `/usr/lib` or `/usr/libexec`
+- PHASE1.md, DESIGN.MD and README.md now show chapter 7 as done
+- Corrected the Perl notes: all Perl paths were checked, not only some of them (the earlier text still said the vendor and sitearch settings needed checking)
+- Next: back the image up again, compare the Perl and cleanup recipes with the book's 13.1 pages, then plan chapter 8 (enlarge the image first)

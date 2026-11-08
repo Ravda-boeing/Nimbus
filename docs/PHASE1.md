@@ -97,12 +97,14 @@ can touch the real Mint system.
 - Bison 3.8.2: installed; `bison --version` verified inside the chroot on
   2026-11-08 (log: `bison-ch7.log`).
 - Perl 5.44.0: installed and verified on 2026-11-08 (`perl -V:prefix` is `/usr`,
-  `useshrplib` is true). It was built by hand, so `recipes/ch7/perl.sh` was
-  reconstructed afterwards; its vendor and sitearch settings are not yet checked.
+  `useshrplib` is true, and the vendor and site paths were checked too). It was
+  built by hand, so `recipes/ch7/perl.sh` was reconstructed afterwards from the
+  installed settings.
 - Zlib 1.3.2 and mpdecimal 4.0.1: built and verified (2026-11-03). They are not
   in the list above from the book; the reason they were added is not recorded.
 - Python 3.14.7, Texinfo 7.3, Util-linux 2.42.2: built and verified (2026-11-08).
-- Cleanup: `recipes/ch7/cleanup.sh` written (2026-11-08), not yet run.
+- Cleanup: `recipes/ch7/cleanup.sh` run and verified on 2026-11-08 (documentation
+  and `.la` files removed, `/tools` gone). Chapter 7 is complete.
 - Section numbers: the recipe headers say Python 7.12, Texinfo 7.13 and
   Util-linux 7.14, which fits the book having two more sections earlier than the
   old status list assumed. The 13.1 book numbers the cleanup 7.15 (its table of
@@ -173,11 +175,9 @@ nothing and says nothing.)
 
 ## Next
 
-1. Check the Perl recipe's vendor and sitearch settings against `perl -V:<name>`
-   and the book.
-2. Run `recipes/ch7/cleanup.sh` inside the chroot. The tested gzip backup of the
-   image from 2026-11-08 is the "before cleanup" backup, as long as the image has
-   not been changed since.
+1. Compare `recipes/ch7/perl.sh` and `recipes/ch7/cleanup.sh` with the book's
+   13.1 pages.
+2. Back up the image again now that chapter 7 is complete.
 3. Chapter 8: the real base system (many packages; the build disk will need to
    be larger, so plan to enlarge the image before the final GCC build).
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

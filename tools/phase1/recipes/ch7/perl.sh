@@ -5,9 +5,9 @@
 # Reconstructed on 2026-11-08, after the fact: Perl was first built by hand with
 # `sh Configure -des` and `-D useshrplib`. The installed perl reports prefix=/usr,
 # privlib=archlib=/usr/lib/perl5/5.44/core_perl, sitelib=/usr/lib/perl5/5.44/site_perl
-# and useshrplib=true; those are what this recipe is written to reproduce. The
-# vendorprefix, sitearch, vendorlib and vendorarch settings below follow the book's
-# layout and still need checking against `perl -V:<name>` and the book's page.
+# useshrplib=true, vendorprefix=/usr, sitearch=/usr/lib/perl5/5.44/site_perl and
+# vendorlib=vendorarch=/usr/lib/perl5/5.44/vendor_perl; this recipe is written to
+# reproduce those settings. It has not been compared with the book's page.
 set -euo pipefail
 
 if [ "$(id -u)" -ne 0 ] ||
