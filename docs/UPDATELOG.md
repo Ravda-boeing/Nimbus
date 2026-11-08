@@ -261,3 +261,11 @@ Phase 1/2: npskg checked in the chroot, first chapter 8 recipes
 - Grew the build image from 16 GB to 30 GB (`truncate`, `e2fsck -f`, `resize2fs`); 4.6 GB used after the cleanup. Backups of the image (gzip, tested) taken before and after the cleanup, kept on the USB drive
 - Added `tools/phase1/recipes/ch8/man-pages.sh` and `iana-etc.sh` in recipe format v2 (`package()` installs into the stage directory). Version numbers come from the tarball name in /sources. A dry run with stand-in tarballs built, installed, verified and gave correct ownership; not yet run with the real tarballs
 - The Man-pages install command is from the LFS 12.x page and has not been compared with the 13.1 page
+
+### 2026-11-09 - Rav
+Phase 1: Glibc recipes written (not run yet)
+- Added `tools/phase1/recipes/ch8/glibc.sh` (Glibc 2.44 with the FHS and upstream-fixes patches, the test suite, a staged `DESTDIR` install and the time zone data) and `glibc-config.sh` (the book's `/etc/nsswitch.conf` and `/etc/ld.so.conf`, in a separate package that depends on glibc)
+- Written from the LFS development book page for Glibc-2.44 (r13.1-39), not the 13.1 release page; patch and tzdata names match `/sources`
+- The test suite runs inside `build()` and does not stop the build on failures; results go to `/sources/.logs/glibc-check.log` and are printed so they can be reviewed before installing
+- Installing glibc needs `npskg --force` (the temporary Glibc's files are owned by no package); locales are left for a later glibc-locales recipe
+- Dry run of glibc-config with a stand-in glibc package: installs, verifies, files correct. glibc.sh has only had its syntax checked
