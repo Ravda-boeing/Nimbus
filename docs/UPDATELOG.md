@@ -198,32 +198,35 @@ Phase 2: npskg prototype
 - Not done: upgrades, config-file handling, converting the Phase 1 recipes to `package()`, running it inside the chroot
 - `docs/PACKAGES.md` updated with the decisions and a description of the prototype; DESIGN.MD and README.md point to it
 
-## 2026-11-03 — Phase 1: Chapter 7 Zlib and mpdecimal
+### 2026-11-03 - Rav
+Phase 1: Chapter 7 Zlib and mpdecimal
+- Added the Zlib 1.3.2 and mpdecimal 4.0.1 Chapter 7 build recipes
+- Built and installed both inside the LFS chroot
+- Verified their shared libraries with `ldconfig -p` and the installed headers
+- Not recorded at the time: why these two were added to chapter 7 (they are not in the chapter 7 list in `docs/PHASE1.md`)
 
-- Added the Zlib 1.3.2 Chapter 7 build recipe.
-- Added the mpdecimal 4.0.1 Chapter 7 build recipe.
-- Successfully built and installed both packages inside the LFS chroot.
-- Verified their shared libraries with `ldconfig -p`.
-- Verified the installed headers for Zlib and mpdecimal.
+### 2026-11-08 - Rav
+Phase 1: Chapter 7 Python
+- Added `tools/phase1/recipes/ch7/python.sh` for Python 3.14.7
+- Compiled and installed it inside the LFS chroot
+- Verified `python3.14 --version` and `python3 --version` both report Python 3.14.7
+- Verified `/usr/lib/libpython3.14.so.1.0` exists
 
-### 2026-11-08 — Phase 1: Chapter 7 Python
+### 2026-11-08 - Rav
+Phase 1: Chapter 7 Texinfo
+- Added `tools/phase1/recipes/ch7/texinfo.sh` for Texinfo 7.3
+- Built and installed it inside the LFS chroot
+- Verified `makeinfo`, `install-info` and `texindex` all report version 7.3
 
-- Added `tools/phase1/recipes/ch7/python.sh` for Python 3.14.7.
-- Successfully compiled and installed Python 3.14.7 inside the LFS chroot.
-- Verified `python3.14 --version` and `python3 --version` both report Python 3.14.7.
-- Verified `/usr/lib/libpython3.14.so.1.0` exists.
+### 2026-11-08 - Rav
+Phase 1: Chapter 7 Util-linux
+- Added `tools/phase1/recipes/ch7/util-linux.sh` for Util-linux 2.42.2, following the LFS 13.1-systemd Chapter 7.14 temporary-tools instructions
+- Built and installed it inside the LFS chroot
+- Verified `mount`, `blkid` and `fdisk` all report Util-linux 2.42.2
 
-### 2026-11-08 — Phase 1: Chapter 7 Texinfo
-
-- Added `tools/phase1/recipes/ch7/texinfo.sh` for Texinfo 7.3.
-- Successfully built and installed Texinfo inside the LFS chroot.
-- Verified `makeinfo`, `install-info`, and `texindex` all report version 7.3.
-
-### 2026-11-08 — Phase 1: Prepare Util-linux
-
-- Added `tools/phase1/recipes/ch7/util-linux.sh` for Util-linux 2.42.2.
-- Recipe follows the LFS 13.1-systemd Chapter 7.14 temporary-tools instructions.
-- Build and installation verification pending.
-
-- Util-linux 2.42.2 build and installation completed successfully.
-- Verified `mount`, `blkid`, and `fdisk` all report Util-linux 2.42.2.
+### 2026-11-08 - Rav
+Docs: bring Phase 1 status up to date
+- UPDATELOG: gave the 2026-11-03 and 2026-11-08 entries the same heading style as the rest, and merged the two Util-linux entries into one
+- PHASE1.md: rewrote the chapter 7 status (Zlib, mpdecimal, Python, Texinfo and Util-linux are done; cleanup is not started), recorded that Perl and Bison have no verified build in the log, and updated the Next list
+- DESIGN.MD and README.md: chapter 7 now shown as nearly done, with only the cleanup remaining
+- Open: the Python and Util-linux recipe headers say 7.12 and 7.14, but the status list in PHASE1.md numbers them 7.10 and 7.12; check against the book

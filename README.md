@@ -50,7 +50,7 @@ To boot a different kernel (for testing): `NIMBUS_KERNEL=/path/to/kernel make ru
 Phase 1 builds a full toolchain and base system with the LFS 13.1 (systemd)
 book, on a loop-mounted build disk at `/mnt/lfs`. Each package is a small
 recipe under `tools/phase1/recipes/`, built by `tools/phase1/build-pkg.sh` as the
-`lfs` user. Chapters 5 and 6 are built; Chapter 7 is in progress.
+`lfs` user. Chapters 5 and 6 are built; Chapter 7 is nearly done (the cleanup remains).
 
 **Read `docs/PHASE1.md` before touching `/mnt/lfs`.** It covers recovering after
 a reboot (the build disk and chroot mounts do not survive one) and the safety

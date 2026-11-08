@@ -46,8 +46,9 @@ The project is for learning first. Taking the long road is the point.
 - **Phase 1 - Toolchain and base system** (LFS 13.1 systemd). *In progress.*
   - Chapter 5, cross-toolchain: done.
   - Chapter 6, cross-compiled temporary tools: done.
-  - Chapter 7, chroot and more temporary tools: started (Gettext built;
-    Bison, Perl, Python, Texinfo, Util-linux and cleanup remaining).
+  - Chapter 7, chroot and more temporary tools: nearly done (Gettext, Bison,
+    Perl, Zlib, mpdecimal, Python, Texinfo and Util-linux installed; cleanup
+    remaining).
   - Chapters 8 to 11, the real base system, configuration, kernel and
     bootloader: not started.
 - **Phase 2 - Package manager.** `.npskg` build recipes, dependencies,
