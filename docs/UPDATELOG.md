@@ -269,3 +269,10 @@ Phase 1: Glibc recipes written (not run yet)
 - The test suite runs inside `build()` and does not stop the build on failures; results go to `/sources/.logs/glibc-check.log` and are printed so they can be reviewed before installing
 - Installing glibc needs `npskg --force` (the temporary Glibc's files are owned by no package); locales are left for a later glibc-locales recipe
 - Dry run of glibc-config with a stand-in glibc package: installs, verifies, files correct. glibc.sh has only had its syntax checked
+
+### 2026-11-09 - Rav
+npskg: opt-in build workspace preservation
+- Added `NPSKG_KEEP_BUILD=1` to preserve recipe build workspaces after successful or failed builds; default cleanup behaviour is unchanged
+- Added tests for default cleanup, successful preservation, failed-build preservation and invalid setting values
+- Host test suite: 96 passed, 0 failed
+- Documented the setting in PACKAGES.md; the updated script has not yet been copied into the LFS chroot

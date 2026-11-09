@@ -200,7 +200,17 @@ How it keeps to the safety rules above (each one has a test):
 - Dependencies and `Conflicts` are checked, including version constraints
   (`>=`, `<=`, `=`, `>>`, `<<`) and `Provides`. There is a lock against two runs.
 
-Run the tests (no root needed): `tools/npskg/test.sh`.
+### Preserving build workspaces
+
+By default, `npskg build` removes its temporary workspace after the build. For debugging, set `NPSKG_KEEP_BUILD=1` to preserve it after successful or failed builds:
+
+```bash
+NPSKG_KEEP_BUILD=1 npskg build recipe.sh
+```
+
+npskg prints the preserved directory path. It contains extracted source under `src/`, staged package files under `stage/`, and generated package metadata. These directories can be large; inspect and remove them manually when no longer needed. Default cleanup remains unchanged.
+
+Run the tests (no root needed): `tools/npskg/test.sh` (96 checks).
 
 ### Not done yet
 

@@ -17,7 +17,8 @@
 #           --out DIR    where `build` and `pack` write the .npskg (default .)
 #
 # Environment for `build`: NPSKG_SOURCES (tarballs, default /sources),
-#                          NPSKG_WORK (scratch space, default /var/tmp/npskg)
+#                          NPSKG_WORK (scratch space, default /var/tmp/npskg),
+#                          NPSKG_KEEP_BUILD=1 (preserve build workspace)
 set -euo pipefail
 shopt -s nullglob
 export LC_ALL=C
@@ -28,14 +29,27 @@ FORCE=0
 OUT=.
 args=()
 TMP=""
+BUILD_TMP=""
+KEEP_BUILD="${NPSKG_KEEP_BUILD:-0}"
 LOCKED=0
+
+case "$KEEP_BUILD" in
+    0|1) ;;
+    *) echo "npskg: NPSKG_KEEP_BUILD must be 0 or 1" >&2; exit 1 ;;
+esac
 
 die() { echo "npskg: $*" >&2; exit 1; }
 say() { echo "npskg: $*"; }
 usage() { sed -n '2,22p' "$0"; exit 1; }
 
 cleanup() {
-    [ -z "$TMP" ] || rm -rf -- "$TMP"
+    if [ -n "$TMP" ]; then
+        if [ "$TMP" = "$BUILD_TMP" ] && [ "$KEEP_BUILD" = 1 ]; then
+            say "keeping build directory: $TMP"
+        else
+            rm -rf -- "$TMP"
+        fi
+    fi
     if [ "$LOCKED" = 1 ]; then rmdir "$DB/lock" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
@@ -177,7 +191,9 @@ cmd_build() {
     local recipe src_dir work
     recipe=$(realpath -- "${args[0]}"); [ -f "$recipe" ] || die "no such recipe: ${args[0]}"
     work="${NPSKG_WORK:-/var/tmp/npskg}"
-    mkdir -p "$work"; work=$(mktemp -d "$work/build.XXXXXX"); TMP=$work
+    mkdir -p "$work"; work=$(mktemp -d "$work/build.XXXXXX")
+    TMP=$work
+    BUILD_TMP=$work
     (
         set -euo pipefail
         NPSKG_SOURCES="${NPSKG_SOURCES:-/sources}"
@@ -220,7 +236,13 @@ cmd_build() {
         if declare -F scripts_dir >/dev/null; then scripts=$(scripts_dir); fi
         make_package "$work/META" "$PKGDIR" "$scripts" "$OUT"
     )
-    rm -rf -- "$work"; TMP=""
+    if [ "$KEEP_BUILD" = 1 ]; then
+        say "keeping build directory: $work"
+    else
+        rm -rf -- "$work"
+    fi
+    TMP=""
+    BUILD_TMP=""
 }
 
 # ---------------------------------------------------------------- install

@@ -208,6 +208,29 @@ package() { make DESTDIR="$PKGDIR" install; }
 REC
 NPSKG_SOURCES="$W/sources" NPSKG_WORK="$W/work" "$NP" --out "$W/pkgs" build "$W/recipe-tool.sh" > "$W/out" 2>&1
 check "build produces a .npskg" test -f "$W/pkgs/tool-3.1.npskg"
+check "default build removes its workspace" test -z "$(find "$W/work" -mindepth 1 -maxdepth 1 -type d -name 'build.*' -print -quit)"
+
+# Opt-in preservation after a successful build.
+NPSKG_SOURCES="$W/sources" NPSKG_WORK="$W/work-keep" NPSKG_KEEP_BUILD=1 "$NP" --out "$W/pkgs" build "$W/recipe-tool.sh" > "$W/out" 2>&1
+said "keeping build directory:" "successful build reports its preserved workspace"
+KEEP_SUCCESS=$(find "$W/work-keep" -mindepth 1 -maxdepth 1 -type d -name 'build.*' -print -quit)
+check "successful build workspace is preserved" test -d "$KEEP_SUCCESS"
+check "preserved workspace contains staged files" test -d "$KEEP_SUCCESS/stage"
+
+# Opt-in preservation after a failed build.
+cat > "$W/recipe-fail.sh" <<'REC'
+NAME=broken
+VERSION=1
+build() { echo "failure marker" > build-marker; return 1; }
+package() { :; }
+REC
+refuse "a deliberately failing build exits non-zero" env NPSKG_SOURCES="$W/sources" NPSKG_WORK="$W/work-fail" NPSKG_KEEP_BUILD=1 "$NP" --out "$W/pkgs" build "$W/recipe-fail.sh"
+said "keeping build directory:" "failed build reports its preserved workspace"
+KEEP_FAIL=$(find "$W/work-fail" -mindepth 1 -maxdepth 1 -type d -name 'build.*' -print -quit)
+check "failed build workspace is preserved" test -d "$KEEP_FAIL"
+check "failed build marker survives" test -f "$KEEP_FAIL/src/build-marker"
+
+refuse "invalid NPSKG_KEEP_BUILD value is rejected" env NPSKG_KEEP_BUILD=maybe "$NP" list
 newroot n; RN=$(R n); "$NP" --root "$RN" install "$W/pkgs/hello-1.0.npskg" >/dev/null 2>&1
 check "built package installs (its dependency is present)" "$NP" --root "$RN" install "$W/pkgs/tool-3.1.npskg"
 check "built package verifies" "$NP" --root "$RN" verify tool
