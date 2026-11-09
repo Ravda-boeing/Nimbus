@@ -276,3 +276,14 @@ npskg: opt-in build workspace preservation
 - Added tests for default cleanup, successful preservation, failed-build preservation and invalid setting values
 - Host test suite: 96 passed, 0 failed
 - Documented the setting in PACKAGES.md; the updated script has not yet been copied into the LFS chroot
+
+### 2026-11-09 - Rav
+Phase 1: Glibc 2.44 built and tested (not installed yet)
+- Built `recipes/ch8/glibc.sh` with npskg on the Aspire and ran the test suite inside `build()` (about 4 hours; the build image is on a USB stick)
+- `make check` result: 6772 passed, 8 failed, 579 unsupported, 16 expected failures (7375 outcomes)
+- Failing tests: `iconv/tst-iconv_prog`, `iconvdata/tst-e2big`, `io/tst-lchmod`, `stdio-common/tst-fseek-mmap`, `stdio-common/tst-printf-format-d-int`, `stdio-common/tst-printf-format-f-uchar`, `stdlib/test-bz22786`, `timezone/tst-tzset`
+- Not yet compared with the book's list of usual failures, so it is not decided whether any of the 8 matter. Glibc has not been installed
+- npskg deleted the build workspace after the build, so the per-test `.out` files are gone; this is why `NPSKG_KEEP_BUILD=1` (entry above) was added. The full test log is still in `/sources/.logs/glibc-check.log` on the build image
+- glibc.sh header and PHASE1.md updated to say the recipe has now been run
+- Copied the updated npskg into the chroot (SHA-256 hashes matched) and ran its tests there: 96 passed, 0 failed (the host suite also passes 96/96)
+

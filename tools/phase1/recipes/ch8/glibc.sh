@@ -4,7 +4,8 @@
 # Install:  npskg --force install /sources/pkgs/glibc-<version>.npskg   (see below)
 #
 # Written from the LFS development book (r13.1-39) page for Glibc-2.44, not the 13.1
-# release page; patch and tzdata file names are the ones in /sources. Not run yet.
+# release page; patch and tzdata file names are the ones in /sources. Built once on
+# 2026-11-09 (make check: 8 failures, see docs/UPDATELOG.md); not installed yet.
 #
 # - build() runs the test suite, which the book calls critical. It does NOT stop the
 #   build on failures: it writes /sources/.logs/glibc-check.log and prints the failing
