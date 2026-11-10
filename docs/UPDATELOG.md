@@ -302,3 +302,13 @@ Phase 1: the 8 Glibc test failures investigated
 - `stdlib/test-bz22786` was killed by the timeout in the full run, but run alone with `TIMEOUTFACTOR=10` it finished in 15 s as UNSUPPORTED ("Heuristically determined OOM termination"). So it was not a speed problem; memory is the likelier cause
 - Result: no failure points at a bad Glibc build. Glibc is still not installed
 
+
+### 2026-11-10 - Rav
+Phase 1: Glibc 2.44 installed and verified
+- Installed the debug-run Glibc 2.44 package with `npskg --force`; the temporary toolchain's Glibc files were not owned by a package
+- Before installation, created and checked `/sources/glibc-pre-install-backup.tar`; its 1465 expected entries matched the archive contents (POSIX ACL support was unavailable)
+- Ran `ldconfig` successfully (exit status 0)
+- Verified Glibc with npskg: 3469 entries, 0 problems
+- Built and installed `glibc-config` 1, providing `/etc/nsswitch.conf` and `/etc/ld.so.conf`; verification: 4 entries, 0 problems
+- Both configuration files exist with root ownership and mode 644
+- The full test-suite results and investigation of its 8 failures are recorded in the earlier entries above

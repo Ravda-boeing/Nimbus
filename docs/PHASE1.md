@@ -175,19 +175,16 @@ nothing and says nothing.)
 
 ## Next
 
-0. Glibc 2.44 (chapter 8) is built and tested but **not installed**. `make check`
-   gave 6772 passed, 8 failed, 579 unsupported, 16 expected failures; the 8
-   failures are listed in `docs/UPDATELOG.md` (2026-11-09) and still need
-   comparing with the book. Investigated on 2026-11-10 (see `docs/UPDATELOG.md`):
-   6 pass alone, `tst-lchmod` is the known chroot failure, `test-bz22786` is
-   UNSUPPORTED (OOM heuristic) alone. Next: install Glibc with npskg.
+0. Glibc 2.44 and `glibc-config` 1 are installed in the chroot and verified:
+   - Glibc: 3469 entries, 0 problems
+   - glibc-config: 4 entries, 0 problems
+   - `ldconfig` completed successfully
+   - The full test-suite results and investigation of the 8 failures are
+     recorded in `docs/UPDATELOG.md`.
 1. Compare `recipes/ch7/perl.sh` and `recipes/ch7/cleanup.sh` with the book's
    13.1 pages.
-2. Back up the image again now that chapter 7 is complete.
-3. Chapter 8 recipes live in `tools/phase1/recipes/ch8/` (format v2, built with
-   `npskg`). Copy `tools/npskg/` and the recipes into `$LFS/sources/` (as
-   `npskg/` and `nimbus/recipes/`), enter the chroot, then
-   `/sources/npskg/npskg --out /sources/pkgs build /sources/nimbus/recipes/ch8/<n>.sh`
-   and `npskg install` the result. Chapter 8: the real base system (many packages; the build disk will need to
-   be larger, so plan to enlarge the image before the final GCC build).
+2. Back up the image again now that chapter 7 is complete and Glibc is installed.
+3. Continue Chapter 8 using the 13.1 release book pages. Check each recipe
+   against its corresponding page before running it. Recipes live in
+   `tools/phase1/recipes/ch8/` and use npskg format v2.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.
