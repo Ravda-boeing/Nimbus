@@ -178,8 +178,9 @@ nothing and says nothing.)
 0. Glibc 2.44 (chapter 8) is built and tested but **not installed**. `make check`
    gave 6772 passed, 8 failed, 579 unsupported, 16 expected failures; the 8
    failures are listed in `docs/UPDATELOG.md` (2026-11-09) and still need
-   comparing with the book. Read `/sources/.logs/glibc-check.log` first; if it
-   is not enough, rebuild with `NPSKG_KEEP_BUILD=1` so the workspace survives.
+   comparing with the book. Investigated on 2026-11-10 (see `docs/UPDATELOG.md`):
+   6 pass alone, `tst-lchmod` is the known chroot failure, `test-bz22786` is
+   UNSUPPORTED (OOM heuristic) alone. Next: install Glibc with npskg.
 1. Compare `recipes/ch7/perl.sh` and `recipes/ch7/cleanup.sh` with the book's
    13.1 pages.
 2. Back up the image again now that chapter 7 is complete.

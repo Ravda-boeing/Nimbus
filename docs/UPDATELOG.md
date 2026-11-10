@@ -293,3 +293,12 @@ Phase 1: glibc.sh can run selected tests only
 - `GLIBC_TESTS="io/tst-lchmod ..."` runs just those tests (log: `/sources/.logs/glibc-tests.log`) instead of the 4-hour full suite; `GLIBC_TIMEOUTFACTOR=10` enlarges timeouts. Meant to be used with `NPSKG_KEEP_BUILD=1` to look into the 8 failures from 2026-11-09
 - The full run now uses `make check -k -i`, as the book does
 - Not run yet (syntax-checked only)
+
+### 2026-11-10 - Rav (later)
+Phase 1: the 8 Glibc test failures investigated
+- Rebuilt Glibc with `NPSKG_KEEP_BUILD=1` and ran only the 8 failing tests (`GLIBC_TESTS`); the package went to `/sources/pkgs-debug`, nothing was installed. Host kernel: 7.0.0-38-generic
+- Six pass when run on their own: `iconv/tst-iconv_prog`, `iconvdata/tst-e2big`, `stdio-common/tst-fseek-mmap`, `stdio-common/tst-printf-format-d-int`, `stdio-common/tst-printf-format-f-uchar`, `timezone/tst-tzset`. Why they failed inside the full run is not known (their output from that run was lost)
+- `io/tst-lchmod` fails because the test sees its open files under a `/mnt/lfs` prefix inside the chroot; this is the book's known chroot failure
+- `stdlib/test-bz22786` was killed by the timeout in the full run, but run alone with `TIMEOUTFACTOR=10` it finished in 15 s as UNSUPPORTED ("Heuristically determined OOM termination"). So it was not a speed problem; memory is the likelier cause
+- Result: no failure points at a bad Glibc build. Glibc is still not installed
+
