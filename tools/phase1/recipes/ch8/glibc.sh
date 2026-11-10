@@ -7,6 +7,9 @@
 # release page; patch and tzdata file names are the ones in /sources. Built once on
 # 2026-11-09 (make check: 8 failures, see docs/UPDATELOG.md); not installed yet.
 #
+# - Debug: GLIBC_TESTS="io/tst-lchmod ..." runs just those tests (log:
+#   /sources/.logs/glibc-tests.log) instead of the full suite; GLIBC_TIMEOUTFACTOR=10
+#   enlarges timeouts. Combine with NPSKG_KEEP_BUILD=1. The package is still produced.
 # - build() runs the test suite, which the book calls critical. It does NOT stop the
 #   build on failures: it writes /sources/.logs/glibc-check.log and prints the failing
 #   tests, so you can compare them with the book's list of usual failures BEFORE
@@ -42,15 +45,35 @@ build() {
                  --enable-kernel=5.10
     make
 
-    # Test suite: critical per the book; a few failures are expected.
     mkdir -p /sources/.logs
-    echo "glibc: running the test suite (long); log: /sources/.logs/glibc-check.log"
-    make check > /sources/.logs/glibc-check.log 2>&1 \
-        || echo "glibc: make check exited non-zero (a few failures are normal)"
-    echo "glibc: failing tests:"
-    grep -E '^(FAIL|ERROR|XPASS)' tests.sum || echo "  none"
-    echo "glibc: timeouts:"
-    grep "Timed out" $(find . -name '*.out') 2>/dev/null || echo "  none"
+    if [ -n "${GLIBC_TESTS:-}" ]; then
+        # Debug mode: run only the tests named in GLIBC_TESTS (space separated,
+        # as subdir/name, e.g. "io/tst-lchmod timezone/tst-tzset") instead of the
+        # whole suite. GLIBC_TIMEOUTFACTOR enlarges the timeouts (default 1).
+        # Use with NPSKG_KEEP_BUILD=1 so build/<test>.out survives for inspection.
+        local t log=/sources/.logs/glibc-tests.log
+        : > "$log"
+        echo "glibc: running only: $GLIBC_TESTS (log: $log)"
+        for t in $GLIBC_TESTS; do
+            echo "=== $t ===" >> "$log"
+            TIMEOUTFACTOR=${GLIBC_TIMEOUTFACTOR:-1} make test t="$t" >> "$log" 2>&1 \
+                && echo "glibc: PASS $t" || echo "glibc: FAIL $t"
+            if [ -f "$t.out" ]; then
+                echo "--- $t.out (last 40 lines) ---" >> "$log"
+                tail -n 40 "$t.out" >> "$log"
+            fi
+        done
+    else
+        # Full test suite: critical per the book; a few failures are expected.
+        # -k -i is the book's workaround for a failed test ending the run early.
+        echo "glibc: running the test suite (long); log: /sources/.logs/glibc-check.log"
+        make check -k -i > /sources/.logs/glibc-check.log 2>&1 \
+            || echo "glibc: make check exited non-zero (a few failures are normal)"
+        echo "glibc: failing tests:"
+        grep -E '^(FAIL|ERROR|XPASS)' tests.sum || echo "  none"
+        echo "glibc: timeouts:"
+        grep "Timed out" $(find . -name '*.out') 2>/dev/null || echo "  none"
+    fi
 }
 
 package() {

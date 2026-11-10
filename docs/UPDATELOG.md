@@ -287,3 +287,9 @@ Phase 1: Glibc 2.44 built and tested (not installed yet)
 - glibc.sh header and PHASE1.md updated to say the recipe has now been run
 - Copied the updated npskg into the chroot (SHA-256 hashes matched) and ran its tests there: 96 passed, 0 failed (the host suite also passes 96/96)
 
+
+### 2026-11-10 - Rav
+Phase 1: glibc.sh can run selected tests only
+- `GLIBC_TESTS="io/tst-lchmod ..."` runs just those tests (log: `/sources/.logs/glibc-tests.log`) instead of the 4-hour full suite; `GLIBC_TIMEOUTFACTOR=10` enlarges timeouts. Meant to be used with `NPSKG_KEEP_BUILD=1` to look into the 8 failures from 2026-11-09
+- The full run now uses `make check -k -i`, as the book does
+- Not run yet (syntax-checked only)
