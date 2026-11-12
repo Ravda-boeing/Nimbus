@@ -186,9 +186,10 @@ nothing and says nothing.)
 2. Done 2026-11-12: image backed up after the Glibc install
    (`nimbus-backups/lfs-ch8-glibc-installed.img.zst` on the NIMBUS partition, same USB
    stick as the image). A second copy on another disk is still to do.
-3. Chapter 8: Zlib 1.3.2 is built, installed and verified (14 entries, 0 problems;
-   recipe `recipes/ch8/zlib.sh`). Next in the book: Bzip2. Continue Chapter 8 using the
-   13.1 release book pages. Check each recipe
+3. Chapter 8: Zlib 1.3.2 (14 entries) and Bzip2 1.0.8 (37 entries) are built, installed
+   and verified with 0 problems (recipes `recipes/ch8/zlib.sh`, `recipes/ch8/bzip2.sh`).
+   Next in the book: Xz. Continue Chapter 8 using the 13.1 release book pages.
+   Check each recipe
    against its corresponding page before running it. Recipes live in
    `tools/phase1/recipes/ch8/` and use npskg format v2.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.
