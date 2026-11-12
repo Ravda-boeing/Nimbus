@@ -188,12 +188,16 @@ nothing and says nothing.)
    Readline (2026-11-13, `nimbus-backups/lfs-ch8-readline-installed.img.zst`). A second
    copy on another disk is still to do.
 3. Chapter 8: Zlib 1.3.2 (14 entries), Bzip2 1.0.8 (37), Xz 5.8.3 (397), Lz4 1.10.0 (23),
-   Zstd 1.5.7 (26), File 5.48 (23) and Readline 8.3 (52) are built, installed and
-   verified with 0 problems (re-checked 2026-11-13). Recipes live in
+   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52) and Pcre2 10.47 (247) are built,
+   installed and verified with 0 problems (all but Pcre2 re-checked 2026-11-13). Recipes live in
    `tools/phase1/recipes/ch8/` and use npskg format v2.
    Zlib and Xz were written from the 13.1-systemd rc1 page and Bzip2 from the r13.1-19
-   development page; compare them with the final release pages.
+   development page, Pcre2 from the r13.1 and systemd development pages; compare them
+   with the final release pages.
    Packages that ship info pages hit Glibc's ownership of `/usr/share/info/dir`: strip it
-   in the recipe's `package()` (as readline.sh does) rather than using `--force`. Continue Chapter 8 using the 13.1 release book pages and check
+   in the recipe's `package()` (as readline.sh does) rather than using `--force`.
+   Libtool `.la` files are not shipped in packages (see pcre2.sh); the book deletes them
+   in its final cleanup.
+   Continue Chapter 8 using the 13.1 release book pages and check
    each recipe against its corresponding page before running it.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

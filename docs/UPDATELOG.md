@@ -351,3 +351,11 @@ Phase 1: catch-up record for Lz4, Zstd, File and Readline
 - File: the install was refused because 7 files from the temporary system are owned by no package; they were backed up to `/var/tmp/file-preinstall-backup.tar` (copied to `/sources/file-pre-install-backup.tar` on 2026-11-13) and the package was installed with `npskg --force`
 - Readline: built with shared `libreadline.so.8.3` and `libhistory.so.8.3`, linked with `-lncursesw`; a `const` qualifier warning in `tilde.c` did not stop the build; no test suite was run. The first install was refused because the package contained `/usr/share/info/dir`, which Glibc owns, so `package()` now removes `$PKGDIR/usr/share/info/dir` from the stage (the three Readline `.info` files stay). It was not installed with `--force`
 - Image backup after these installs: `nimbus-backups/lfs-ch8-readline-installed.img.zst` (30 GiB to 3.46 GiB, `zstd -t` passed, same USB stick as the image). The read-only `e2fsck -fn` before it printed small free block and inode count mismatches and skipped journal recovery; it found no structural errors. The image was mounted afterwards, and the check is to be repeated after a clean unmount
+
+### 2026-11-13 - Rav (later)
+Phase 1: Pcre2 10.47 built, installed and verified
+- Added `recipes/ch8/pcre2.sh` (recipe format v2), written from the LFS 13.1 development pages (r13.1 and the systemd view) for Pcre2-10.47, not the final release page; the release page still has to be compared. Configure options as in the book (Unicode, JIT, 16- and 32-bit libraries, `pcre2grep` with zlib and bzip2, `pcre2test` with readline, no static library)
+- Built with npskg on the Aspire: `make check` passed (4 of 4 tests; log `/sources/.logs/pcre2-build.log`)
+- Deviation from the book: `package()` removes the four libtool `.la` files (`libpcre2-8.la`, `-16`, `-32`, `-posix`) from the stage. The book keeps them until its final cleanup, which would then invalidate npskg's file records. Package `/sources/pkgs/pcre2-10.47.npskg`, 247 entries
+- Installed without `--force` (none of its files existed before; no info files in the package); `npskg verify`: 247 entries, 0 problems; `ldconfig` exit status 0 with all four libraries in its cache
+- `pcre2grep` links `libpcre2-8`, `libz` and `libbz2` and `pcre2grep -o '\d+'` printed `123`; a small C program linked with `-lpcre2-8` matched `42-nimbus`
