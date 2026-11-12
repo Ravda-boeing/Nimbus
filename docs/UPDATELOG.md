@@ -312,3 +312,18 @@ Phase 1: Glibc 2.44 installed and verified
 - Built and installed `glibc-config` 1, providing `/etc/nsswitch.conf` and `/etc/ld.so.conf`; verification: 4 entries, 0 problems
 - Both configuration files exist with root ownership and mode 644
 - The full test-suite results and investigation of its 8 failures are recorded in the earlier entries above
+
+### 2026-11-12 - Rav
+Phase 1: image backup after the Glibc install
+- Checked the unmounted build image with `e2fsck -fn`: clean
+- Compressed it with `zstd -T0 -3` (30 GiB to 3.48 GiB, about 8 minutes) to `nimbus-backups/lfs-ch8-glibc-installed.img.zst` on the NIMBUS partition; `zstd -t` passed
+- It is on the same USB stick as the image, so it does not protect against the stick failing; the stick's NTFS partition has only 2.0G free and the internal Windows partition 6.1G, so a second copy elsewhere is still to do
+
+### 2026-11-12 - Rav (later)
+Phase 1: Zlib 1.3.2 built, installed and verified
+- Added `recipes/ch8/zlib.sh` (recipe format v2), written from the LFS 13.1-systemd rc1 page for Zlib-1.3.2, not the final release page; the commands are the same as in the 13.0 and 12.4 books
+- Built with npskg on the Aspire: `make check` passed (zlib, 64-bit and shared tests OK); package `/sources/pkgs/zlib-1.3.2.npskg`, 14 entries; the static library is removed in the stage, as in the book
+- Before installing, saved the six temporary-system files to `/sources/zlib-pre-install-backup.tar`
+- The plain install refused because those six files are owned by no package, so it was installed with `npskg --force`
+- Verified with npskg: 14 entries, 0 problems; `ldconfig` ran with exit status 0 and `libz.so.1` is in its cache
+- Also compiled and ran a small C program against the installed library with `-lz`: it printed `zlib 1.3.2: hello zlib` and linked `/usr/lib/libz.so.1`. (`gzip` does not use Zlib, so it is not a test of it)
