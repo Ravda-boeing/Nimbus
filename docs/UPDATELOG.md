@@ -343,3 +343,11 @@ Phase 1: Xz 5.8.3 built, installed and verified
 - `npskg verify xz`: 397 entries, 0 problems
 - `ldconfig` completed with exit status 0; both `liblzma.so.5` and `liblzma.so` appear in the linker cache, and `/usr/bin/xz` resolves `liblzma.so.5`
 - Compression/decompression round trip passed (`diff` exit status 0)
+
+### 2026-11-13 - Rav
+Phase 1: catch-up record for Lz4, Zstd, File and Readline
+- Recipes `recipes/ch8/lz4.sh`, `zstd.sh`, `file.sh` and `readline.sh` (Lz4 1.10.0, Zstd 1.5.7, File 5.48, Readline 8.3) were built, installed and pushed on 2026-11-12/13 (commits b221e9540 and 70b114a86). The log entries were deferred then and are written now, so test results for Lz4, Zstd and File were not recorded here
+- All four are installed and verified with npskg, checked again on 2026-11-13: lz4 23 entries, zstd 26, file 23, readline 52, each with 0 problems
+- File: the install was refused because 7 files from the temporary system are owned by no package; they were backed up to `/var/tmp/file-preinstall-backup.tar` (copied to `/sources/file-pre-install-backup.tar` on 2026-11-13) and the package was installed with `npskg --force`
+- Readline: built with shared `libreadline.so.8.3` and `libhistory.so.8.3`, linked with `-lncursesw`; a `const` qualifier warning in `tilde.c` did not stop the build; no test suite was run. The first install was refused because the package contained `/usr/share/info/dir`, which Glibc owns, so `package()` now removes `$PKGDIR/usr/share/info/dir` from the stage (the three Readline `.info` files stay). It was not installed with `--force`
+- Image backup after these installs: `nimbus-backups/lfs-ch8-readline-installed.img.zst` (30 GiB to 3.46 GiB, `zstd -t` passed, same USB stick as the image). The read-only `e2fsck -fn` before it printed small free block and inode count mismatches and skipped journal recovery; it found no structural errors. The image was mounted afterwards, and the check is to be repeated after a clean unmount
