@@ -334,3 +334,12 @@ Phase 1: Bzip2 1.0.8 built, installed and verified
 - Built with npskg on the Aspire: the package's six compress/decompress tests passed (the Makefile's `-Winline` warnings are harmless); package `/sources/pkgs/bzip2-1.0.8.npskg`, 37 entries
 - Installed without `--force` (none of its files existed before); `npskg verify`: 37 entries, 0 problems; `ldconfig` exit status 0; `bzip2` is linked against `libbz2.so.1.0`; a compress/decompress round trip works
 - Mistake and fix: the book's commands were pasted into the chroot shell by accident (current directory `/`), which left four dangling symlinks (`/usr/lib/libbz2.so`, `/usr/lib/libbz2.so.1`, `/usr/bin/bzcat`, `/usr/bin/bunzip2`); all other commands failed with "No such file". Removed the four dangling symlinks before installing the package
+
+### 2026-11-12 - Rav
+Phase 1: Xz 5.8.3 built, installed and verified
+- Added `recipes/ch8/xz.sh` (npskg recipe format v2), written from the LFS 13.1-systemd rc1 page; comparison with the final release page is still pending
+- Built and packaged Xz 5.8.3; package `/sources/pkgs/xz-5.8.3.npskg`
+- Installation initially encountered seven unowned temporary-system files (`lzcat`, `lzcmp`, `lzdiff`, `lzegrep`, `lzfgrep`, `lzgrep`, `lzless`); backed them up in `/sources/xz-pre-install-backup.tar` and installed with `--force`
+- `npskg verify xz`: 397 entries, 0 problems
+- `ldconfig` completed with exit status 0; both `liblzma.so.5` and `liblzma.so` appear in the linker cache, and `/usr/bin/xz` resolves `liblzma.so.5`
+- Compression/decompression round trip passed (`diff` exit status 0)
