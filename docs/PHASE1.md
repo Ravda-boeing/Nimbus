@@ -188,8 +188,8 @@ nothing and says nothing.)
    Readline (2026-11-13, `nimbus-backups/lfs-ch8-readline-installed.img.zst`). A second
    copy on another disk is still to do.
 3. Chapter 8: Zlib 1.3.2 (14 entries), Bzip2 1.0.8 (37), Xz 5.8.3 (397), Lz4 1.10.0 (23),
-   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52), Pcre2 10.47 (247) and M4 1.4.21 (93) are built,
-   installed and verified with 0 problems (all but Pcre2 and M4 re-checked 2026-11-13). Recipes live in
+   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52), Pcre2 10.47 (247), M4 1.4.21 (93) and Bc 7.0.3 (64) are built,
+   installed and verified with 0 problems (all but Pcre2, M4 and Bc re-checked 2026-11-13). Recipes live in
    `tools/phase1/recipes/ch8/` and use npskg format v2.
    Zlib and Xz were written from the 13.1-systemd rc1 page and Bzip2 from the r13.1-19
    development page, Pcre2 from the r13.1 and systemd development pages; compare them
@@ -205,5 +205,7 @@ nothing and says nothing.)
    locale files); backup in `/sources/m4-pre-install-backup-full.tar`.
    Continue Chapter 8 using the 13.1 release book pages and check
    each recipe against its corresponding page before running it.
-   Next in the book: Bc, Flex, Tcl, Expect, DejaGNU, Pkgconf, Binutils.
+   Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
+   `falseUL` undeclared in `src/data.c`.
+   Next in the book: Flex, Tcl, Expect, DejaGNU, Ninja, Pkgconf, Binutils.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

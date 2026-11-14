@@ -375,3 +375,12 @@ M4 1.4.21 (Chapter 8) built, tested, installed and verified
 - `npskg verify m4`: 93 entries, 0 problems; the new `/usr/bin/m4` differs from the temporary one, `m4 --version` reports 1.4.21, a `define` and an `esyscmd` test work, and `ldd` shows only glibc
 - Earlier `make -C lib libm4.a` failing on `O_SEARCH` was not a bug: that target skips the build step that generates `lib/fcntl.h`; a plain `make` generates it
 - `docs/PHASE1.md`: added M4 to the Chapter 8 progress list and the Next list
+
+### 2026-11-14 - Rav (later still)
+Bc 7.0.3 (Chapter 8) built, tested, installed and verified
+- Added `recipes/ch8/bc.sh` (commands from the 12.3/12.4 and 13.0 book pages; still to compare with the 13.1 release page)
+- With plain `CC=gcc` the build failed in `src/data.c` (`'falseUL' undeclared`): Bc pastes `true`/`false` together with `UL`, which breaks when they are keywords (GCC 16.2.0 defaults to C23). The recipe uses `CC='gcc -std=c99'`
+- `npskg build`: exit 0, package `bc-7.0.3.npskg` (64 entries); `make test` passed (exit 0, the dc part printed `All dc tests passed.`)
+- Installed without `--force` (no existing files); `npskg verify bc`: 64 entries, 0 problems
+- `bc --version` and `dc --version` report 7.0.3; `2^100` gives 1267650600228229401496703205376 in both; `bc -l` computes pi to 20 digits; `ldd` shows readline, ncursesw and glibc; `dc` is a link to `bc`
+- `docs/PHASE1.md`: added Bc, and added Ninja-1.13.2 (between DejaGNU and Pkgconf in the 13.1 book) to the list of what comes next
