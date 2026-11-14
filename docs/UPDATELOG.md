@@ -374,3 +374,4 @@ M4 1.4.21 (Chapter 8) built, tested, installed and verified
 - Installed with `npskg --force install`: 28 files had no owner (`/usr/bin/m4` plus 27 `m4.mo` locale files left by the Chapter 6 temporary M4). Backup of those files: `/sources/m4-pre-install-backup-full.tar`
 - `npskg verify m4`: 93 entries, 0 problems; the new `/usr/bin/m4` differs from the temporary one, `m4 --version` reports 1.4.21, a `define` and an `esyscmd` test work, and `ldd` shows only glibc
 - Earlier `make -C lib libm4.a` failing on `O_SEARCH` was not a bug: that target skips the build step that generates `lib/fcntl.h`; a plain `make` generates it
+- `docs/PHASE1.md`: added M4 to the Chapter 8 progress list and the Next list
