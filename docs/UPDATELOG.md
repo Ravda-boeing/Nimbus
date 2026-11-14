@@ -359,3 +359,18 @@ Phase 1: Pcre2 10.47 built, installed and verified
 - Deviation from the book: `package()` removes the four libtool `.la` files (`libpcre2-8.la`, `-16`, `-32`, `-posix`) from the stage. The book keeps them until its final cleanup, which would then invalidate npskg's file records. Package `/sources/pkgs/pcre2-10.47.npskg`, 247 entries
 - Installed without `--force` (none of its files existed before; no info files in the package); `npskg verify`: 247 entries, 0 problems; `ldconfig` exit status 0 with all four libraries in its cache
 - `pcre2grep` links `libpcre2-8`, `libz` and `libbz2` and `pcre2grep -o '\d+'` printed `123`; a small C program linked with `-lpcre2-8` matched `42-nimbus`
+
+### 2026-11-14 - Rav
+M4: prevent the recursive gnulib spawn wrapper
+- Updated the Chapter 8 M4 recipe to seed gnulib's configure cache with the detected availability of `posix_spawn_file_actions_addchdir_np`
+- Added a pre-build check that refuses to compile if `spawn_faction_addchdir` is still selected
+- This is a build-time workaround for the confirmed recursive wrapper; a successful fresh build and tests are still pending
+
+### 2026-11-14 - Rav (later)
+M4 1.4.21 (Chapter 8) built, tested, installed and verified
+- `recipes/ch8/m4.sh` now patches the generated `configure` itself: when `posix_spawn_file_actions_addchdir` is missing but glibc has the `_np` function, `HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR` is set to 1, so gnulib no longer selects its recursive `spawn_faction_addchdir.c` wrapper (the cause of the `test-posix_spawn_file_actions_addchdir` hang: the wrapper jumped to itself). The patch must match exactly once or the build stops
+- Kept the cache seed and the dry-run guard from the earlier entry, and added a check that the wrapper object is not in `lib/libm4.a`; `make check` is bounded by `timeout 7200`
+- Fresh `NPSKG_KEEP_BUILD=1 npskg build` from a clean extraction: exit 0, package `m4-1.4.21.npskg` (93 entries). Gnulib tests: 382 total, 312 PASS, 70 SKIP (locale, Windows-only, thread and git/cvs tests), 0 FAIL, 0 ERROR. M4's own `checks/` suite: all checks successful (7 `changeword` checks skipped, feature not enabled)
+- Installed with `npskg --force install`: 28 files had no owner (`/usr/bin/m4` plus 27 `m4.mo` locale files left by the Chapter 6 temporary M4). Backup of those files: `/sources/m4-pre-install-backup-full.tar`
+- `npskg verify m4`: 93 entries, 0 problems; the new `/usr/bin/m4` differs from the temporary one, `m4 --version` reports 1.4.21, a `define` and an `esyscmd` test work, and `ldd` shows only glibc
+- Earlier `make -C lib libm4.a` failing on `O_SEARCH` was not a bug: that target skips the build step that generates `lib/fcntl.h`; a plain `make` generates it
