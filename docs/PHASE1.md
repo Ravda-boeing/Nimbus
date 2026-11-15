@@ -9,7 +9,7 @@ way. Read this file before touching `/mnt/lfs`.
 
 | What | Where |
 |---|---|
-| Build disk (16 GB sparse ext4 image) | `~/nimbus-build/lfs.img` |
+| Build disk (30 GB ext4 image, on the NIMBUS USB partition on the Aspire) | `/media/$USER/NIMBUS/nimbus-build/lfs.img` (earlier work on the Veriton used `~/nimbus-build/lfs.img`) |
 | Its mount point (called `$LFS`) | `/mnt/lfs` |
 | Source tarballs and patches | `$LFS/sources` (96 files from the book's download list) |
 | Our runner and recipes, as copied for the `lfs` user | `$LFS/sources/nimbus/` |
@@ -29,7 +29,7 @@ itself is safe.
 
 ```bash
 cd ~/Desktop/Nimbus
-e2fsck -f ~/nimbus-build/lfs.img     # only while it is NOT mounted; answer y to fixes
+e2fsck -f /media/$USER/NIMBUS/nimbus-build/lfs.img     # only while it is NOT mounted; answer y to fixes
 tools/phase1/lfs-disk.sh mount
 export LFS=/mnt/lfs                  # keep the leading slash
 ls -l /bin/sh                        # must say bash; if dash: sudo ln -sfv bash /bin/sh
@@ -188,7 +188,7 @@ nothing and says nothing.)
    Readline (2026-11-13, `nimbus-backups/lfs-ch8-readline-installed.img.zst`). A second
    copy on another disk is still to do.
 3. Chapter 8: Zlib 1.3.2 (14 entries), Bzip2 1.0.8 (37), Xz 5.8.3 (397), Lz4 1.10.0 (23),
-   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52), Pcre2 10.47 (247), M4 1.4.21 (93) and Bc 7.0.3 (64) are built,
+   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52), Pcre2 10.47 (247), iana-etc, man-pages, M4 1.4.21 (93), Bc 7.0.3 (64) and Flex 2.6.4 (97) are built,
    installed and verified with 0 problems (all but Pcre2, M4 and Bc re-checked 2026-11-13). Recipes live in
    `tools/phase1/recipes/ch8/` and use npskg format v2.
    Zlib and Xz were written from the 13.1-systemd rc1 page and Bzip2 from the r13.1-19
@@ -207,5 +207,9 @@ nothing and says nothing.)
    each recipe against its corresponding page before running it.
    Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
    `falseUL` undeclared in `src/data.c`.
-   Next in the book: Flex, Tcl, Expect, DejaGNU, Ninja, Pkgconf, Binutils.
+   Recipes for Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2
+   and Pkgconf were committed on 2026-11-15, but no build or install has been recorded for
+   them yet. Each one must be built, checked against its 13.1 page, verified with npskg
+   and logged in UPDATELOG before it is listed as done. Chapter 8 items still to do:
+   those recipes, then anything else the book lists after Pkgconf.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

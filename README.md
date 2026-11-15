@@ -29,6 +29,13 @@ Log in with `nimbus` / `os`. Leave with `power shutdown` (or Ctrl+A then X).
 
 To boot a different kernel (for testing): `NIMBUS_KERNEL=/path/to/kernel make run`
 
+## Status
+
+- Phase 0 (kernel 7.2.8 boots and shuts down cleanly in QEMU): done.
+- Phase 1 (LFS 13.1 base system, built from scratch): in progress, Chapter 8. See
+  `docs/PHASE1.md` for the runbook and current status, and `docs/UPDATELOG.md` for
+  the record of each change.
+
 ## Layout
 
 | Path | What |
