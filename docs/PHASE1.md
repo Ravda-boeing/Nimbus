@@ -207,9 +207,8 @@ nothing and says nothing.)
    each recipe against its corresponding page before running it.
    Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
    `falseUL` undeclared in `src/data.c`.
-   Recipes for Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2
-   and Pkgconf were committed on 2026-11-15, but no build or install has been recorded for
-   them yet. Each one must be built, checked against its 13.1 page, verified with npskg
-   and logged in UPDATELOG before it is listed as done. Chapter 8 items still to do:
-   those recipes, then anything else the book lists after Pkgconf.
+   Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2 and Pkgconf
+   are built and installed (reported 2026-11-15). Their npskg verify counts and test results
+   still need to be recorded in `docs/UPDATELOG.md`. Open question: the book's Chapter 8
+   also includes GCC, and the repo has no Chapter 8 GCC recipe yet.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

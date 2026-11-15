@@ -389,6 +389,6 @@ Bc 7.0.3 (Chapter 8) built, tested, installed and verified
 Phase 1: documentation caught up with the repository
 - Flex 2.6.4 (Chapter 8): built and installed, as reported in the 2026-11-14 handoff. `make check` 114/114 passed, package 97 entries, installed without `--force`, `npskg verify flex` 0 problems. Recipe `recipes/ch8/flex.sh` committed 2026-11-15
 - iana-etc 20260805 and man-pages 6.18: built, installed and verified through npskg on 2026-11-08 (from the session notes). Entry counts are not recorded here, and the recipes were not in the repository before this entry
-- Recipes committed on 2026-11-15 with no build or install record yet: Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja and Pkgconf. This entry does not claim that any of them has been built. Each will get its own entry once it is built and verified
+- Recipes committed on 2026-11-15: Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja and Pkgconf. Reported by Rav as built and installed. The npskg entry counts, verify results and test results for these are not yet recorded in these docs
 - `docs/PHASE1.md`: build disk path and size corrected for the Aspire; Chapter 8 status and Next list updated
 - `README.md`: added a short status section (Phase 0 done, Phase 1 in progress)
