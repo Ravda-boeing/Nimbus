@@ -217,14 +217,19 @@ nothing and says nothing.)
    are built and installed (reported 2026-11-15). Their npskg verify counts and test results
    still need to be recorded in `docs/UPDATELOG.md`. A Chapter 8 GCC 16.2.0 recipe is drafted
    in `tools/phase1/recipes/ch8/gcc.sh` and has been compared with the 13.1 release page.
-   It still needs a successful build and test run, npskg verification, and post-install
-   compiler/linker sanity checks before it can be listed as done. Its test command
-   now reports the `make -k check` status and GCC's test summary; review these against the
-   LFS build logs before installing the package. The post-install compiler and linker sanity
-   checks from the page also remain to be run. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
+   Its first build completed compilation, tests, and staged install, but package creation
+   failed because the older recipe searched the wrong directory for GCC's LTO plugin. The
+   test summary had 43 unexpected failures and 3 unresolved tests. The old npskg removed the
+   failed workspace. The recipe now checks both plugin locations, and npskg now preserves
+   failed workspaces; GCC must be rebuilt and verified before installation. Post-install
+   compiler and linker sanity checks also remain. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
    have since been built and installed with npskg. Sed and Psmisc build tests passed;
    Ncurses' test suite runs only after installation, as described in its `test/README`,
    and remains to be run. Package verification counts still need to be recorded.
+   A Gettext 1.0 recipe is drafted and includes its `make check`. The first build compiled,
+   then stalled in `gettext-tools/gnulib-tests/test-execute.sh`; its helper subprocess
+   reported `ENOENT` despite the helper and ELF loader being present. The run was stopped
+   without producing a package; retry on the SSD and investigate if the failure recurs.
    Drafts exist for every ordinary Chapter 8 package through
    E2fsprogs (8.82), in book order. The remaining no-auxiliary recipes have been
    reviewed against final release pages and are ready for npskg builds after GCC; recipes
