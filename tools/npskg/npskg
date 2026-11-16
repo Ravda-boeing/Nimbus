@@ -43,14 +43,17 @@ say() { echo "npskg: $*"; }
 usage() { sed -n '2,22p' "$0"; exit 1; }
 
 cleanup() {
+    local exit_status=$?
     if [ -n "$TMP" ]; then
-        if [ "$TMP" = "$BUILD_TMP" ] && [ "$KEEP_BUILD" = 1 ]; then
+        if [ "$TMP" = "$BUILD_TMP" ] && \
+           { [ "$KEEP_BUILD" = 1 ] || [ "$exit_status" -ne 0 ]; }; then
             say "keeping build directory: $TMP"
         else
             rm -rf -- "$TMP"
         fi
     fi
     if [ "$LOCKED" = 1 ]; then rmdir "$DB/lock" 2>/dev/null || true; fi
+    return "$exit_status"
 }
 trap cleanup EXIT
 

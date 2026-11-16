@@ -203,12 +203,32 @@ nothing and says nothing.)
    wrapper, which made `test-posix_spawn_file_actions_addchdir` hang. It was installed with
    `--force` for 28 files that had no owner (the temporary `/usr/bin/m4` and 27 `m4.mo`
    locale files); backup in `/sources/m4-pre-install-backup-full.tar`.
-   Continue Chapter 8 using the 13.1 release book pages and check
-   each recipe against its corresponding page before running it.
+   The Chapter 8 recipes from Ncurses through E2fsprogs have now been reviewed
+   against their final 13.1-systemd pages. Recipes needing extra book files
+   remain outside the no-auxiliary set: Coreutils (i18n patch), Kbd (backspace
+   patch), Python (OpenSSL patch), Tar (ACL patch), and Systemd (man-pages
+   archive). Findutils, Groff, and IPRoute2 were updated to final versions
+   4.11.0, 1.24.1, and 7.1.0. The remaining recipes still need builds and tests.
+   Do not queue the GCC recipe until its current build has finished and its test
+   results have been reviewed.
    Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
    `falseUL` undeclared in `src/data.c`.
    Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2 and Pkgconf
    are built and installed (reported 2026-11-15). Their npskg verify counts and test results
-   still need to be recorded in `docs/UPDATELOG.md`. Open question: the book's Chapter 8
-   also includes GCC, and the repo has no Chapter 8 GCC recipe yet.
+   still need to be recorded in `docs/UPDATELOG.md`. A Chapter 8 GCC 16.2.0 recipe is drafted
+   in `tools/phase1/recipes/ch8/gcc.sh` and has been compared with the 13.1 release page.
+   It still needs a successful build and test run, npskg verification, and post-install
+   compiler/linker sanity checks before it can be listed as done. Its test command
+   now reports the `make -k check` status and GCC's test summary; review these against the
+   LFS build logs before installing the package. The post-install compiler and linker sanity
+   checks from the page also remain to be run. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
+   have since been built and installed with npskg. Sed and Psmisc build tests passed;
+   Ncurses' test suite runs only after installation, as described in its `test/README`,
+   and remains to be run. Package verification counts still need to be recorded.
+   Drafts exist for every ordinary Chapter 8 package through
+   E2fsprogs (8.82), in book order. The remaining no-auxiliary recipes have been
+   reviewed against final release pages and are ready for npskg builds after GCC; recipes
+   requiring the extra files above need those files staged first.
+   The remaining Chapter 8 sections (debugging symbols, stripping, and cleanup) are
+   system-wide book procedures, not package recipes; handle them in the finalization runbook.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.
