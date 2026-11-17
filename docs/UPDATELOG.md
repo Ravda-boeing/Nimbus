@@ -1,6 +1,17 @@
 # Update log for Nimbus 
 ## ANY CHANGES MADE TO NIMBUS MUST BE EXPLICITLY STATED IN THIS DOCUMENT
 
+### 2026-11-17 - Reheni
+Phase 1: GCC 16.2.0 packaged and its test failures classified
+- Rebuilt GCC 16.2.0 on a Lenovo ThinkBook 14 (i7-10510U, NVMe, Ubuntu host) after moving the build off the USB stick. Compile finished in about 14 minutes with `MAKEFLAGS=-j6`; `make -k check` ran to completion (218,832 expected passes, 39 unexpected failures, 2 unexpected successes, 1,569 expected failures, 3,992 unsupported) before a battery failure powered off the laptop mid-way through the libstdc++ test run, which never completed.
+- The LFS image's ext4 filesystem needed `e2fsck -fy` after the power loss (orphaned scratch-file inodes and free-count drift from in-flight writes); no damage to the GCC build tree or `gcc.sum`/`gcc.log`, both recovered intact via `debugfs -c rdump`.
+- Packaging had not run yet when power was lost, so it was completed by hand: `make DESTDIR=$PKGDIR install`, followed by the recipe's post-install steps (`cpp`/`cc.1` links, LTO plugin symlink into `usr/lib/bfd-plugins`, gdb auto-load relocation, `.la` cleanup, `info/dir` removal), then packed with `npskg pack` using a hand-written META (the recipe's own META-writing step never ran due to the power cut). Result: `gcc-16.2.0.npskg`, 449M, 1957 entries.
+- Verified the packaged GCC directly from its staged tree with `-B` pointed at the stage: compiles and runs a C program, and LTO (`-flto`) compiles, links, and runs correctly using the staged `liblto_plugin.so` — confirms the plugin-path fix from 2026-11-16 works end to end.
+- `npskg install` into a test root (`--root`) refused with unmet dependencies because binutils has no npskg record; GMP, MPFR, MPC, and zlib do have records. GCC is not yet installed into the live root.
+- Classified all 39 unexpected test failures by rerunning each isolated: 33 trace to this build defaulting to `--enable-default-pie`, which test cases written for non-PIE output don't account for (28 `gcc.target/i386` check-function-bodies/scan-assembler tests, 4 `gcc.dg/lto/toplevel-*-asm-1` link failures — `relocation R_X86_64_32 ... can not be used when making a PIE object` — and `gcc.dg/ipa/pr122458.c`, which is linker PIE warnings tripping the "excess errors" check, not a real error). 6 `gcc.dg/plugin/crash-test-nested-*` failures are explained by `crash_test_plugin.so` never being built, so those tests had no plugin to load. 2 remain unresolved: `gcc.target/i386/pr115102.c` (GCC solves the byte-swap differently than the specific `bswaphisi2_lowpart` pattern the test checks for) and `gcc.target/i386/pr116896.c` (GCC emits `cmovp` instead of the expected `jp` branch — appears to be a codegen difference, not a regression). None of the 39 indicate a miscompiling toolchain.
+- Full test logs (`gcc.sum`, `gcc.log`, `gcc-build.log`) saved outside the image for reference. Package and logs backed up alongside the image.
+- Binutils (Chapter 6, built directly into the live root before npskg staged installs existed) has no npskg package record, which blocks GCC installation. The current repo has a Chapter 8 npskg recipe at `tools/phase1/recipes/ch8/binutils.sh`; rebuild/package binutils with that recipe and install with `--force` before installing GCC. The live image install and verification are still pending.
+
 ### 2026-10-03 - Rav
 - Initial repo structure
 - Added base Makefile

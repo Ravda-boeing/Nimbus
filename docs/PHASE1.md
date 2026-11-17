@@ -209,8 +209,14 @@ nothing and says nothing.)
    patch), Python (OpenSSL patch), Tar (ACL patch), and Systemd (man-pages
    archive). Findutils, Groff, and IPRoute2 were updated to final versions
    4.11.0, 1.24.1, and 7.1.0. The remaining recipes still need builds and tests.
-   Do not queue the GCC recipe until its current build has finished and its test
-   results have been reviewed.
+   GCC 16.2.0 has since been built, packaged, and verified from its staged tree
+   (including an LTO compile/link/run). Its 39 unexpected testsuite failures
+   were classified; the libstdc++ tests did not complete after a host power loss.
+   The package is not yet installed: binutils was built directly into the root
+   before npskg and has no package record. Rebuild/package binutils with the
+   current Chapter 8 recipe, install it with `npskg install --force`, then
+   install and verify the GCC package. The Chapter 8 GCC recipe and its build
+   results are recorded in `docs/UPDATELOG.md`.
    Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
    `falseUL` undeclared in `src/data.c`.
    Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2 and Pkgconf
