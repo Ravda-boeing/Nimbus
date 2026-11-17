@@ -5,6 +5,7 @@ NAME=bison
 VERSION=3.8.2
 TARBALL='bison-3.8.2.tar.xz'
 SUMMARY='Parser generator'
+DEPENDS=(gettext)
 
 build() {
     ./configure --prefix=/usr \

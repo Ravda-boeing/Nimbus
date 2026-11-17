@@ -6,8 +6,13 @@ VERSION=5.3
 TARBALL='bash-5.3.tar.gz'
 SUMMARY='The GNU Bourne-Again Shell'
 DEPENDS=(readline ncurses)
+SOURCE_MD5=977c8c0c5ae6309191e7768e28ebc951
 
 build() {
+    local source_archive
+    source_archive=$(tarball_path "$TARBALL") || return 1
+    printf '%s  %s\n' "$SOURCE_MD5" "$source_archive" | md5sum -c - || return 1
+
     ./configure --prefix=/usr \
                 --without-bash-malloc \
                 --with-installed-readline \
