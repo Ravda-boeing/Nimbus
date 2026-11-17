@@ -8,6 +8,21 @@ build() {
     make || return 1
     chmod o+x .. || return 1
     chown -R tester . || return 1
-    su tester -c "PATH=$PATH make check -k"
+    local check_status=0 failures errors failure_count
+    su tester -c "PATH=$PATH make check -k" || check_status=$?
+    if [ "$check_status" -ne 0 ]; then
+        failures=$(find . -type f \( -name test-suite.log -o -name testsuite.log \) \
+            -exec grep -h '^FAIL:' {} + || true)
+        errors=$(find . -type f \( -name test-suite.log -o -name testsuite.log \) \
+            -exec grep -h '^ERROR:' {} + || true)
+        failure_count=$(printf '%s\n' "$failures" | awk 'NF {n++} END {print n+0}')
+        if [ "$failure_count" -eq 1 ] && [[ "$failures" == *test-regex-el* ]] && [ -z "$errors" ]; then
+            echo 'Disposition: the sole test-regex-el failure is documented by LFS.'
+        else
+            printf 'Findutils test failures:\n%s\n' "${failures:-<none>}"
+            printf 'Findutils test errors:\n%s\n' "${errors:-<none>}"
+            return "$check_status"
+        fi
+    fi
 }
 package() { make DESTDIR="$PKGDIR" install || return 1; rm -f "$PKGDIR/usr/share/info/dir"; }

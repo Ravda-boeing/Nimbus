@@ -5,6 +5,7 @@ NAME=autoconf
 VERSION=2.73
 TARBALL='autoconf-2.73.tar.xz'
 SUMMARY='Extensible M4-based shell script code generator'
+DEPENDS=(m4 perl)
 
 build() {
     ./configure --prefix=/usr || return 1

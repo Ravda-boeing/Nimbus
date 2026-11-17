@@ -5,7 +5,7 @@ NAME=automake
 VERSION=1.18.1
 TARBALL='automake-1.18.1.tar.xz'
 SUMMARY='Makefile generator for use with Autoconf'
-DEPENDS=(autoconf)
+DEPENDS=(autoconf m4 perl)
 
 build() {
     ./configure --prefix=/usr \

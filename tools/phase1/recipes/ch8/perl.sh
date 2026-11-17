@@ -5,7 +5,7 @@ NAME=perl
 VERSION=5.44.0
 TARBALL='perl-5.44.0.tar.xz'
 SUMMARY='Practical Extraction and Report Language'
-DEPENDS=(gdbm less ncurses zlib bzip2)
+DEPENDS=(gdbm less ncurses zlib bzip2 libxcrypt)
 
 build() {
     export BUILD_ZLIB=False BUILD_BZIP2=0

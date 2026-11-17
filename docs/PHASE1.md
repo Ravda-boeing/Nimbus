@@ -220,25 +220,19 @@ nothing and says nothing.)
    `falseUL` undeclared in `src/data.c`.
    Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2 and Pkgconf
    are built and installed (reported 2026-11-15). Their npskg verify counts and test results
-   still need to be recorded in `docs/UPDATELOG.md`. A Chapter 8 GCC 16.2.0 recipe is drafted
-   in `tools/phase1/recipes/ch8/gcc.sh` and has been compared with the 13.1 release page.
-   Its first build completed compilation, tests, and staged install, but package creation
-   failed because the older recipe searched the wrong directory for GCC's LTO plugin. The
-   test summary had 43 unexpected failures and 3 unresolved tests. The old npskg removed the
-   failed workspace. The recipe now checks both plugin locations, and npskg now preserves
-   failed workspaces; GCC must be rebuilt and verified before installation. Post-install
-   compiler and linker sanity checks also remain. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
+   still need to be recorded in `docs/UPDATELOG.md`. GCC 16.2.0 is now installed and verified;
+   the 2026-11-17 update-log entry records its current test summary, package checks, and
+   compiler/LTO smoke checks. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
    have since been built and installed with npskg. Sed and Psmisc build tests passed;
    Ncurses' test suite runs only after installation, as described in its `test/README`,
    and remains to be run. Package verification counts still need to be recorded.
-   A Gettext 1.0 recipe is drafted and includes its `make check`. The first build compiled,
-   then stalled in `gettext-tools/gnulib-tests/test-execute.sh`; its helper subprocess
-   reported `ENOENT` despite the helper and ELF loader being present. The run was stopped
-   without producing a package; retry on the SSD and investigate if the failure recurs.
-   Drafts exist for every ordinary Chapter 8 package through
-   E2fsprogs (8.82), in book order. The remaining no-auxiliary recipes have been
-   reviewed against final release pages and are ready for npskg builds after GCC; recipes
-   requiring the extra files above need those files staged first.
+   Gettext 1.0 has been packaged, installed, and verified (2,811 entries, 0 problems).
+   After an earlier test stall, the recipe was updated to patch generated configure to select
+   glibc's available `_np` function and bound `make check`; the retry completed successfully.
+   Recipes exist in book order through E2fsprogs (8.82). The recipes from Less through Groff
+   (immediately before GRUB) have now been checked for source availability and prepared for
+   npskg builds; the Coreutils and Python auxiliary patches are present in `/sources`.
+   Builds and tests for these packages remain to be done.
    The remaining Chapter 8 sections (debugging symbols, stripping, and cleanup) are
    system-wide book procedures, not package recipes; handle them in the finalization runbook.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

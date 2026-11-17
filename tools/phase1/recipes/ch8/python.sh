@@ -4,7 +4,7 @@ NAME=python
 VERSION=3.14.7
 TARBALL='Python-3.14.7.tar.xz'
 SUMMARY='Python programming language runtime'
-DEPENDS=(openssl bzip2 libffi libxcrypt mpdecimal sqlite zlib)
+DEPENDS=(openssl bzip2 expat gdbm libffi libxcrypt mpdecimal ncurses sqlite zlib)
 build() {
     patch -Np1 -i "$(tarball_path 'Python-3.14.7-openssl_4-1.patch')" || return 1
     ./configure --prefix=/usr --enable-shared --with-system-expat \

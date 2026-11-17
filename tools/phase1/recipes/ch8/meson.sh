@@ -3,7 +3,7 @@ NAME=meson
 VERSION=1.12.0
 TARBALL='meson-1.12.0.tar.gz'
 SUMMARY='Build system for software projects'
-DEPENDS=(python setuptools)
+DEPENDS=(ninja python setuptools wheel)
 build() { pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps "$PWD"; }
 package() {
     pip3 install --root="$PKGDIR" --no-index --find-links dist meson || return 1

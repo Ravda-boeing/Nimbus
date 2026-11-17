@@ -5,6 +5,7 @@ NAME=less
 VERSION=704
 TARBALL='less-704.tar.gz'
 SUMMARY='Text file viewer'
+DEPENDS=(ncurses)
 
 build() {
     ./configure --prefix=/usr --sysconfdir=/etc || return 1

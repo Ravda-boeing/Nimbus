@@ -3,7 +3,7 @@ NAME=kmod
 VERSION=34.2
 TARBALL='kmod-34.2.tar.xz'
 SUMMARY='Kernel module utilities and library'
-DEPENDS=(meson ninja)
+DEPENDS=(meson ninja xz zlib)
 build() {
     meson setup build --prefix=/usr --buildtype=release -D manpages=false || return 1
     ninja -C build

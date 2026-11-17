@@ -12,6 +12,7 @@ build() {
     make || return 1
     make NON_ROOT_USERNAME=tester check-root || return 1
     groupadd -g 102 dummy -U tester || return 1
+    chmod o+x .. || return 1
     chown -R tester . || return 1
     local rc=0
     su tester -c "PATH=$PATH make -k RUN_EXPENSIVE_TESTS=yes check" </dev/null || rc=$?
@@ -23,4 +24,5 @@ package() {
     mv "$PKGDIR/usr/bin/chroot" "$PKGDIR/usr/sbin/" || return 1
     mv "$PKGDIR/usr/share/man/man1/chroot.1" "$PKGDIR/usr/share/man/man8/chroot.8" || return 1
     sed -i 's/"1"/"8"/' "$PKGDIR/usr/share/man/man8/chroot.8"
+    rm -f "$PKGDIR/usr/share/info/dir" || return 1
 }

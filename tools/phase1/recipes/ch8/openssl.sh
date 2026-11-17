@@ -5,6 +5,7 @@ NAME=openssl
 VERSION=4.0.1
 TARBALL='openssl-4.0.1.tar.gz'
 SUMMARY='Cryptographic management tools and libraries'
+DEPENDS=(perl)
 
 build() {
     ./config --prefix=/usr \
