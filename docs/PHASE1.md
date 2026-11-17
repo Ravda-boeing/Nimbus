@@ -231,10 +231,11 @@ nothing and says nothing.)
    glibc's available `_np` function and bound `make check`; the retry completed successfully.
    Bison 3.8.2 has also been rebuilt as a Chapter 8 npskg package and installed with
    `--force` over the untracked Chapter 7 installation: 329 entries, 0 verification problems.
+   Less 704 has now been packaged, installed, and verified (13 entries, 0 problems).
    Recipes exist in book order through E2fsprogs (8.82). The recipes from Less through Groff
-   (immediately before GRUB) have now been checked for source availability and prepared for
+   (immediately before GRUB) have been checked for source availability and prepared for
    npskg builds; the Coreutils and Python auxiliary patches are present in `/sources`.
-   Builds and tests for these packages remain to be done.
+   Builds and tests for the remaining packages are still to be done.
    The remaining Chapter 8 sections (debugging symbols, stripping, and cleanup) are
    system-wide book procedures, not package recipes; handle them in the finalization runbook.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.
