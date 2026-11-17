@@ -229,6 +229,8 @@ nothing and says nothing.)
    Gettext 1.0 has been packaged, installed, and verified (2,811 entries, 0 problems).
    After an earlier test stall, the recipe was updated to patch generated configure to select
    glibc's available `_np` function and bound `make check`; the retry completed successfully.
+   Bison 3.8.2 has also been rebuilt as a Chapter 8 npskg package and installed with
+   `--force` over the untracked Chapter 7 installation: 329 entries, 0 verification problems.
    Recipes exist in book order through E2fsprogs (8.82). The recipes from Less through Groff
    (immediately before GRUB) have now been checked for source availability and prepared for
    npskg builds; the Coreutils and Python auxiliary patches are present in `/sources`.

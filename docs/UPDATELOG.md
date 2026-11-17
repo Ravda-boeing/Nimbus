@@ -15,6 +15,11 @@ Phase 1: GCC 16.2.0 packaged and its test failures classified
 - Gettext 1.0 was rebuilt with the gnulib configure workaround, packaged (2,811 entries), and installed with `--force` over the previously unowned Chapter 7 `msgfmt`, `msgmerge`, and `xgettext`. `npskg verify gettext` reports 2,811 entries, 0 problems.
 - Reviewed and prepared the 20 Chapter 8 recipes from Less through Groff, immediately before GRUB in the 13.1-systemd book. All required source archives and the Coreutils/Python auxiliary patches are present in `/sources`; the recipes pass `bash -n`. Added package dependencies where runtime libraries/tools are needed, fixed Coreutils' tester workspace traversal and shared Info-index staging, removed Libelf's staged `.la` archives, and taught Findutils/Groff to accept only their individually documented LFS test failure. These packages have not yet been built or tested.
 
+### 2026-11-18 - Reheni
+Phase 1: Bison 3.8.2 packaged and installed
+- Built and tested Bison 3.8.2 with the Chapter 8 npskg recipe; package `/root/bison-3.8.2.npskg` contains 329 entries.
+- Installed with `--force` over the earlier untracked Chapter 7 installation. `npskg verify bison` reports 329 entries, 0 problems; `bison --version` reports GNU Bison 3.8.2.
+
 ### 2026-10-03 - Rav
 - Initial repo structure
 - Added base Makefile
