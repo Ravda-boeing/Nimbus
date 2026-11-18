@@ -1,7 +1,7 @@
-# LFS 13.1-systemd, Chapter 8.50: Libelf from Elfutils 0.195
+# LFS 13.1-systemd, Chapter 8.50: Libelf from Elfutils 0.197
 NAME=libelf
-VERSION=0.195
-TARBALL='elfutils-0.195.tar.bz2'
+VERSION=0.197
+TARBALL='elfutils-0.197.tar.bz2'
 SUMMARY='ELF object file handling library'
 DEPENDS=(bzip2 xz zlib zstd)
 build() {

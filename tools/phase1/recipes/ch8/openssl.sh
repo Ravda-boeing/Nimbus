@@ -1,9 +1,9 @@
-# LFS 13.1-systemd, Chapter 8.49: OpenSSL 4.0.1
+# LFS 13.1-systemd, Chapter 8.49: OpenSSL 4.1.0
 # Recipe format v2, built and staged with npskg.
 
 NAME=openssl
-VERSION=4.0.1
-TARBALL='openssl-4.0.1.tar.gz'
+VERSION=4.1.0
+TARBALL='openssl-4.1.0.tar.gz'
 SUMMARY='Cryptographic management tools and libraries'
 DEPENDS=(perl)
 

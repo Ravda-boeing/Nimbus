@@ -1,12 +1,10 @@
-# LFS 13.1-systemd, Chapter 8.54: Python 3.14.7
-# Requires the LFS auxiliary patch Python-3.14.7-openssl_4-1.patch.
+# LFS 13.1-systemd, Chapter 8.54: Python 3.15.2
 NAME=python
-VERSION=3.14.7
-TARBALL='Python-3.14.7.tar.xz'
+VERSION=3.15.2
+TARBALL='Python-3.15.2.tar.xz'
 SUMMARY='Python programming language runtime'
 DEPENDS=(openssl bzip2 expat gdbm libffi libxcrypt mpdecimal ncurses sqlite zlib)
 build() {
-    patch -Np1 -i "$(tarball_path 'Python-3.14.7-openssl_4-1.patch')" || return 1
     ./configure --prefix=/usr --enable-shared --with-system-expat \
       --enable-optimizations --without-static-libpython || return 1
     make || return 1

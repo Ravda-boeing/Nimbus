@@ -1,7 +1,7 @@
-# LFS 13.1-systemd, Chapter 8.52: Sqlite 3.53.4
+# LFS 13.1-systemd, Chapter 8.52: Sqlite 3.54.1
 NAME=sqlite
-VERSION=3.53.4
-TARBALL='sqlite-autoconf-3530400.tar.gz'
+VERSION=3.54.1
+TARBALL='sqlite-autoconf-3540100.tar.gz'
 SUMMARY='Embedded SQL database engine'
 build() {
     ./configure --prefix=/usr --disable-static --enable-fts4 --enable-fts5 \

@@ -11,4 +11,5 @@ build() {
 package() {
     make DESTDIR="$PKGDIR" install || return 1
     find "$PKGDIR/usr/lib" -type f -name '*.la' -delete
+    rm -f "$PKGDIR/usr/share/info/dir"
 }

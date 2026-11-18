@@ -1,9 +1,9 @@
-# LFS 13.1-systemd, Chapter 8.48: Automake 1.18.1
+# LFS 13.1-systemd, Chapter 8.48: Automake 1.20
 # Recipe format v2, built and staged with npskg.
 
 NAME=automake
-VERSION=1.18.1
-TARBALL='automake-1.18.1.tar.xz'
+VERSION=1.20
+TARBALL='automake-1.20.tar.xz'
 SUMMARY='Makefile generator for use with Autoconf'
 DEPENDS=(autoconf m4 perl)
 
