@@ -1,7 +1,7 @@
-# LFS 13.1-systemd, Chapter 8.58: Setuptools 84.0.0
+# LFS 13.1-systemd, Chapter 8.58: Setuptools 84.2.1
 NAME=setuptools
-VERSION=84.0.0
-TARBALL='setuptools-84.0.0.tar.gz'
+VERSION=84.2.1
+TARBALL='setuptools-84.2.1.tar.gz'
 SUMMARY='Python package build and installation tools'
 DEPENDS=(python wheel)
 build() { pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps "$PWD"; }

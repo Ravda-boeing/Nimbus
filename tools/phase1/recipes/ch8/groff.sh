@@ -1,7 +1,7 @@
-# LFS 13.1-systemd, Chapter 8.64: Groff 1.24.1
+# Nimbus Phase 1, Chapter 8.64: Groff 1.25.0
 NAME=groff
-VERSION=1.24.1
-TARBALL='groff-1.24.1.tar.gz'
+VERSION=1.25.0
+TARBALL='groff-1.25.0.tar.gz'
 SUMMARY='Typesetting system for technical documents'
 DEPENDS=(perl)
 build() {

@@ -21,4 +21,5 @@ package() {
     make DESTDIR="$PKGDIR" install || return 1
     rm -f "$PKGDIR/usr/lib/libltdl.a"
     find "$PKGDIR/usr/lib" -type f -name '*.la' -delete
+    rm -f "$PKGDIR/usr/share/info/dir"
 }

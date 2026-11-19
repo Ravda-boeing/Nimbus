@@ -1,11 +1,11 @@
-# LFS 13.1-systemd, Chapter 8.61: Coreutils 9.11
+# LFS 13.1-systemd, Chapter 8.61: Coreutils 9.12
 NAME=coreutils
-VERSION=9.11
-TARBALL='coreutils-9.11.tar.xz'
+VERSION=9.12
+TARBALL='coreutils-9.12.tar.xz'
 SUMMARY='Basic file, shell, and text utilities'
 build() {
-    cp "$(tarball_path 'coreutils-9.11-i18n-1.patch')" . || return 1
-    patch -Np1 -i coreutils-9.11-i18n-1.patch || return 1
+    cp "$(tarball_path 'coreutils-9.12-i18n-1.patch')" . || return 1
+    patch -Np1 -i coreutils-9.12-i18n-1.patch || return 1
     autoreconf -fv || return 1
     automake -af || return 1
     FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr || return 1
