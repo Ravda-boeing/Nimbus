@@ -198,4 +198,6 @@ nothing and says nothing.)
    Readline (2026-11-13, `nimbus-backups/lfs-ch8-readline-installed.img.zst`). A second
    copy on another disk is still to do.
 3. Chapter 8: see "Chapter 8 status" above for what is built, what is only written, and what to check before building the rest.
-4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.
+4. Chapter 9 configuration is recorded in `docs/CHAPTER9.md` and passes
+   `tools/phase1/check-chapter9.sh`. Then continue with the kernel (use the
+   Nimbus config) and bootloader.
