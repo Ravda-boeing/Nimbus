@@ -11,4 +11,8 @@ build() {
     make || return 1
     make check
 }
-package() { make DESTDIR="$PKGDIR" install; }
+package() {
+    make DESTDIR="$PKGDIR" install || return 1
+    # The global Info index is maintained by the system, not this package.
+    rm -f "$PKGDIR/usr/share/info/dir"
+}

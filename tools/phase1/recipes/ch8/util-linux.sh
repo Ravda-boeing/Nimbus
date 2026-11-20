@@ -1,7 +1,7 @@
-# LFS 13.1-systemd, Chapter 8.81: Util-linux 2.42.2
+# LFS 13.1-systemd r13.1-42, Chapter 8.81: Util-linux 2.42.4
 NAME=util-linux
-VERSION=2.42.2
-TARBALL='util-linux-2.42.2.tar.xz'
+VERSION=2.42.4
+TARBALL='util-linux-2.42.4.tar.xz'
 SUMMARY='Essential Linux system utilities'
 DEPENDS=(ncurses systemd)
 build() {
