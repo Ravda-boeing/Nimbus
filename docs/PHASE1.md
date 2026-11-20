@@ -141,7 +141,9 @@ One SBU (Standard Build Unit, the book's yardstick) is 81 s on this machine.
 
 ## Chapter 8 status (as of 2026-11-20)
 
-There are 81 Chapter 8 recipes in `tools/phase1/recipes/ch8/`, in npskg format v2, for the 13.1-systemd book. The chroot has npskg-installed packages for 79 of those recipes. The remaining packages are Findutils 4.11.0 and GRUB 2.14. The installed package database is under `/var/lib/npskg/installed/` in the LFS root. Build details and known test outcomes are in `docs/UPDATELOG.md`.
+There are 81 Chapter 8 recipes in `tools/phase1/recipes/ch8/`, in npskg format v2, for the 13.1-systemd book. The chroot has npskg-installed packages for 80 of those recipes. The sole remaining package is GRUB 2.14. The installed package database is under `/var/lib/npskg/installed/` in the LFS root. Build details and known test outcomes are in `docs/UPDATELOG.md`.
+
+Findutils 4.11.0 was built and installed on 2026-11-20 (147 entries, verify 0 problems). Its recipe was updated to declare `glibc` dependency and support fallback test execution when `tester` is absent.
 
 Inetutils 2.8 was built and installed on 2026-11-20 (30 entries, verify 0 problems). Its recipe guards `.la` cleanup because this build installs no `/usr/lib` directory.
 
