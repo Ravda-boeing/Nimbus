@@ -3,13 +3,18 @@ NAME=findutils
 VERSION=4.11.0
 TARBALL='findutils-4.11.0.tar.xz'
 SUMMARY='Utilities to find files'
+DEPENDS=(glibc)
 build() {
     ./configure --prefix=/usr --localstatedir=/var/lib/locate || return 1
     make || return 1
-    chmod o+x .. || return 1
-    chown -R tester . || return 1
     local check_status=0 failures errors failure_count
-    su tester -c "PATH=$PATH make check -k" || check_status=$?
+    if id tester >/dev/null 2>&1; then
+        chmod o+x .. || return 1
+        chown -R tester . || return 1
+        su tester -c "PATH=$PATH make check -k" || check_status=$?
+    else
+        make check -k || check_status=$?
+    fi
     if [ "$check_status" -ne 0 ]; then
         failures=$(find . -type f \( -name test-suite.log -o -name testsuite.log \) \
             -exec grep -h '^FAIL:' {} + || true)
