@@ -423,3 +423,27 @@ Phase 1: Chapter 8 recipe work continued
 - Built and installed Ncurses 6.6, Sed 4.10, and Psmisc 23.7 with npskg. Sed and Psmisc tests passed; Ncurses' post-install test suite and package verification counts remain pending.
 - GCC 16.2.0 compiled, completed `make -k check`, and staged installation, but package creation failed because the old recipe searched the wrong LTO plugin directory. Its test summary reported 43 unexpected failures, 2 unexpected successes, and 3 unresolved cases. The old npskg deleted the failed workspace. The recipe now searches both plugin locations, and npskg preserves failed build workspaces for future runs.
 - Gettext compiled but its test run stalled at `gettext-tools/gnulib-tests/test-execute.sh`. `test-execute-main` consumed about one core for several hours; its log reported `test-execute-child subprocess failed: No such file or directory` despite the child binary and ELF loader being present. The terminal was closed before a package was created. Retry on the NVMe machine and investigate if this repeats.
+
+### 2026-11-20 - Reheni
+Phase 1: Chapter 8 recipes updated to the 13.1-systemd book, and the remaining recipes prepared (none of the changes below have been built)
+- Commits `3ea3fe6ad` to `f50df138a` changed recipes only. No recipe for a package already built and installed (see `docs/PHASE1.md`, Chapter 8 status) was changed, so the installed packages still match their recipes
+- Commit `f2689192f` prepared GDBM, Gperf, Expat and Inetutils, and commit `7b1179435` prepared the gettext and core Chapter 8 builds. Commit `b1fdf335c` (2026-11-17) prepared Less through Groff, as logged above
+- Commit `7389b3c43` (2026-11-18) moved these recipes to current versions, with the book revision noted in each header:
+  - Automake 1.20, Coreutils 9.12, D-Bus 1.16.4, Expat 2.10.0, Flit-Core 4.2.0, Groff 1.25.0, Gzip 1.15, IPRoute2 7.3.0, Jinja2 (archive name now lowercase), Kbd 2.10.0, Kmod 34.3, Libelf (Elfutils) 0.197, MarkupSafe 3.0.4, Meson 1.12.1, OpenSSL 4.1.0, Patch 2.8.1, Python 3.15.2, Setuptools 84.2.1
+  - Python 3.14.7 was replaced by 3.15.2. The old header said the recipe required the `Python-3.14.7-openssl_4-1.patch` auxiliary patch. Whether 3.15.2 still needs an auxiliary patch has not been checked against the book
+  - Expat switched its source check from MD5 to SHA-256
+  - Several recipes gained explicit `DEPENDS` lists and source checksums (Gzip, IPRoute2, Kbd, Libpipeline, Make, Patch and others)
+- Commit `bd1042814` (2026-11-20) moved the remaining recipes to current versions (Vim 9.2.1351, Texinfo, Tar, Systemd, Libpipeline and others) and added checksum checks and failure handling. Commit `f50df138a` (2026-11-20) was the same kind of update for the rest
+- Deviations from the book, to review before these are built:
+  - `e2fsprogs.sh` no longer runs `make check` in `build()`. The comment in the recipe says LFS documents `m_assume_storage_prezeroed` as a known failure. `make check` has to be run separately when wanted
+  - `coreutils.sh` accepts exactly one failing test, `test-regex-el`, in both the root check and the tester check. Any other failure, or any error, stops the build
+  - `kbd.sh` applies the backspace patch with a checksum check, as the book does, and strips the global Info index from the package
+- Not built or verified: every recipe changed in these commits. Recipes that need an auxiliary file the book supplies (Coreutils i18n patch, Kbd backspace patch, Python OpenSSL patch, Tar ACL patch, Systemd man-pages archive) need those files in `/sources` first
+
+### 2026-11-20 - Reheni (later)
+Chapter 8 progress and Chapter 9 configuration
+- 79 of the 81 Chapter 8 recipe packages are now installed in npskg. Findutils 4.11.0 and GRUB 2.14 remain to be built and installed.
+- Inetutils 2.8: `make check` passed 10 tests with 1 skipped; packaged as 30 entries, installed with `--force` to replace an unowned `/usr/bin/hostname`, and verified with 0 problems. The recipe now tolerates the package having no `/usr/lib` directory.
+- E2fsprogs 1.47.4 had one known `m_assume_storage_prezeroed` test failure; its package is installed. Coreutils 9.12's remaining `test-regex-el` failure is recorded above.
+- Chapter 8.84 stripping was skipped because it would alter npskg-tracked file checksums. During 8.85 cleanup, package-owned `.la` files were retained; unowned `x86_64-lfs-linux-gnu*` toolchain leftovers and the temporary `tester` account were removed.
+- Chapter 9 configuration was created for hostname `Nimbus`, DHCP on wired interfaces via systemd-networkd, systemd-resolved, locale `en_AU.UTF-8`, US console keymap, and `Australia/Melbourne` timezone. `/etc/profile`, `/etc/inputrc`, and `/etc/shells` were also created.

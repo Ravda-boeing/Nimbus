@@ -139,6 +139,16 @@ One SBU (Standard Build Unit, the book's yardstick) is 81 s on this machine.
 | 6 | binutils-pass2 | 114 |
 | 6 | gcc-pass2 | 1577 |
 
+## Chapter 8 status (as of 2026-11-20)
+
+There are 81 Chapter 8 recipes in `tools/phase1/recipes/ch8/`, in npskg format v2, for the 13.1-systemd book. The chroot has npskg-installed packages for 79 of those recipes. The remaining packages are Findutils 4.11.0 and GRUB 2.14. The installed package database is under `/var/lib/npskg/installed/` in the LFS root. Build details and known test outcomes are in `docs/UPDATELOG.md`.
+
+Inetutils 2.8 was built and installed on 2026-11-20 (30 entries, verify 0 problems). Its recipe guards `.la` cleanup because this build installs no `/usr/lib` directory.
+
+Known test exceptions: Coreutils retains the one accepted `test-regex-el` failure after the other observed failures were rerun successfully. E2fsprogs had one `m_assume_storage_prezeroed` failure. Ncurses' post-install test status still needs recording. These details are in `docs/UPDATELOG.md`.
+
+The 8.84 stripping step was skipped because it would modify npskg-managed files and invalidate their stored checksums. In 8.85, package-owned `.la` files were retained for the same reason; unowned cross-toolchain leftovers and the temporary `tester` account were removed. Chapter 9 configuration has been created for hostname `Nimbus`, systemd-networkd with DHCP on wired interfaces, locale `en_AU.UTF-8`, US console keymap, and `Australia/Melbourne` timezone.
+
 ## How recipes are written
 
 A recipe is a shell file that sets `TARBALL='<glob>'` and defines `build()`. The
@@ -187,55 +197,5 @@ nothing and says nothing.)
    Glibc install (2026-11-12, `nimbus-backups/lfs-ch8-glibc-installed.img.zst`) and after
    Readline (2026-11-13, `nimbus-backups/lfs-ch8-readline-installed.img.zst`). A second
    copy on another disk is still to do.
-3. Chapter 8: Zlib 1.3.2 (14 entries), Bzip2 1.0.8 (37), Xz 5.8.3 (397), Lz4 1.10.0 (23),
-   Zstd 1.5.7 (26), File 5.48 (23), Readline 8.3 (52), Pcre2 10.47 (247), iana-etc, man-pages, M4 1.4.21 (93), Bc 7.0.3 (64) and Flex 2.6.4 (97) are built,
-   installed and verified with 0 problems (all but Pcre2, M4 and Bc re-checked 2026-11-13). Recipes live in
-   `tools/phase1/recipes/ch8/` and use npskg format v2.
-   Zlib and Xz were written from the 13.1-systemd rc1 page and Bzip2 from the r13.1-19
-   development page, Pcre2 from the r13.1 and systemd development pages; compare them
-   with the final release pages.
-   Packages that ship info pages hit Glibc's ownership of `/usr/share/info/dir`: strip it
-   in the recipe's `package()` (as readline.sh does) rather than using `--force`.
-   Libtool `.la` files are not shipped in packages (see pcre2.sh); the book deletes them
-   in its final cleanup.
-   M4 needs a Nimbus patch: its recipe patches the generated `configure` (must match
-   exactly once) so gnulib does not pick the recursive `spawn_faction_addchdir`
-   wrapper, which made `test-posix_spawn_file_actions_addchdir` hang. It was installed with
-   `--force` for 28 files that had no owner (the temporary `/usr/bin/m4` and 27 `m4.mo`
-   locale files); backup in `/sources/m4-pre-install-backup-full.tar`.
-   The Chapter 8 recipes from Ncurses through E2fsprogs have now been reviewed
-   against their final 13.1-systemd pages. Recipes needing extra book files
-   remain outside the no-auxiliary set: Coreutils (i18n patch), Kbd (backspace
-   patch), Python (OpenSSL patch), Tar (ACL patch), and Systemd (man-pages
-   archive). Findutils, Groff, and IPRoute2 were updated to final versions
-   4.11.0, 1.24.1, and 7.1.0. The remaining recipes still need builds and tests.
-   GCC 16.2.0 has been built, packaged, installed, and verified, including
-   compile/run checks with and without LTO. Its 39 unexpected testsuite
-   failures were classified; the libstdc++ tests did not complete after a host
-   power loss. Binutils 2.47 was rebuilt and packaged with the Chapter 8 recipe,
-   then installed with `--force` to register files that had previously been
-   built directly into the root. Both package verifications report 0 problems.
-   See `docs/UPDATELOG.md` for the build, test, and install details.
-   Bc needs `CC='gcc -std=c99'`: with GCC 16 (C23 default) plain `CC=gcc` fails with
-   `falseUL` undeclared in `src/data.c`.
-   Attr, ACL, GMP, MPFR, MPC, Binutils, Tcl, Expect, DejaGNU, Ninja 1.13.2 and Pkgconf
-   are built and installed (reported 2026-11-15). Their npskg verify counts and test results
-   still need to be recorded in `docs/UPDATELOG.md`. GCC 16.2.0 is now installed and verified;
-   the 2026-11-17 update-log entry records its current test summary, package checks, and
-   compiler/LTO smoke checks. Ncurses 6.6, Sed 4.10, and Psmisc 23.7
-   have since been built and installed with npskg. Sed and Psmisc build tests passed;
-   Ncurses' test suite runs only after installation, as described in its `test/README`,
-   and remains to be run. Package verification counts still need to be recorded.
-   Gettext 1.0 has been packaged, installed, and verified (2,811 entries, 0 problems).
-   After an earlier test stall, the recipe was updated to patch generated configure to select
-   glibc's available `_np` function and bound `make check`; the retry completed successfully.
-   Bison 3.8.2 has also been rebuilt as a Chapter 8 npskg package and installed with
-   `--force` over the untracked Chapter 7 installation: 329 entries, 0 verification problems.
-   Less 704 has now been packaged, installed, and verified (13 entries, 0 problems).
-   Recipes exist in book order through E2fsprogs (8.82). The recipes from Less through Groff
-   (immediately before GRUB) have been checked for source availability and prepared for
-   npskg builds; the Coreutils and Python auxiliary patches are present in `/sources`.
-   Builds and tests for the remaining packages are still to be done.
-   The remaining Chapter 8 sections (debugging symbols, stripping, and cleanup) are
-   system-wide book procedures, not package recipes; handle them in the finalization runbook.
+3. Chapter 8: see "Chapter 8 status" above for what is built, what is only written, and what to check before building the rest.
 4. Chapters 9 to 11: configuration, kernel (use the Nimbus config), bootloader.

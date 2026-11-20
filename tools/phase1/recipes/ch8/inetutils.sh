@@ -33,6 +33,8 @@ package() {
     make DESTDIR="$PKGDIR" install || return 1
     install -vd "$PKGDIR/usr/sbin" || return 1
     mv -v "$PKGDIR/usr/bin/ifconfig" "$PKGDIR/usr/sbin/ifconfig" || return 1
-    find "$PKGDIR/usr/lib" -type f -name '*.la' -delete || return 1
+    if [ -d "$PKGDIR/usr/lib" ]; then
+        find "$PKGDIR/usr/lib" -type f -name '*.la' -delete || return 1
+    fi
     rm -f "$PKGDIR/usr/share/info/dir" || return 1
 }
