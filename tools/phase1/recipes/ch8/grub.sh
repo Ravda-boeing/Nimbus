@@ -12,4 +12,8 @@ build() {
       --with-platform=efi --disable-efiemu --disable-werror || return 1
     make
 }
-package() { make DESTDIR="$PKGDIR" install; }
+package() {
+    make DESTDIR="$PKGDIR" install || return 1
+    # The shared Info index is owned by glibc in the LFS system.
+    rm -f "$PKGDIR/usr/share/info/dir"
+}
